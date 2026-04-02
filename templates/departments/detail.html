@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load content_richtext %}
+
+{% block title %}{{ department.name }} | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block department-page-hero">
+    <div class="container">
+        <div class="row g-4 g-lg-5 align-items-start">
+            <div class="col-lg-7">
+                <span class="hero-kicker">Negros Oriental State University</span>
+                <h1 class="display-5 fw-bold mt-3 mb-3">{{ department.name }}</h1>
+                <p class="lead text-secondary mb-4">
+                    {{ department.description|default:"Learn more about the department's academic offerings, faculty, public updates, and alumni highlights." }}
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge text-bg-light border px-3 py-2">{{ department.code }}</span>
+                    {% if programs %}
+                        <span class="badge text-bg-light border px-3 py-2">{{ programs|length }} Programs</span>
+                    {% endif %}
+                    {% if instructors %}
+                        <span class="badge text-bg-light border px-3 py-2">{{ instructors|length }} Instructors</span>
+                    {% endif %}
+                    {% if public_alumni %}
+                        <span class="badge text-bg-light border px-3 py-2">{{ public_alumni|length }} Public Alumni</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="info-card h-100 department-summary-card">
+                    <div class="department-logo-wrap department-logo-wrap-lg mb-3">
+                        {% if department.logo %}
+                            <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
+                        {% else %}
+                            <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                {{ department.code }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <p class="section-eyebrow mb-2">Department Overview</p>
+                    <p class="mb-0 text-secondary">
+                        {{ department.description|default:"This department page is ready to present official programs, faculty profiles, announcements, news, and approved alumni highlights." }}
+                    </p>
+                    <div class="department-summary-metrics mt-4">
+                        <div><strong>{{ programs|length }}</strong><span>Programs</span></div>
+                        <div><strong>{{ instructors|length }}</strong><span>Faculty</span></div>
+                        <div><strong>{{ public_alumni|length }}</strong><span>Public Alumni</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-muted">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Academic Offerings" title="Programs and faculty" description="A quick view of the department's academic programs and public instructor profiles." %}
+        <div class="row g-4">
+            <div class="col-xl-7">
+                <div class="info-card h-100">
+                    <p class="section-eyebrow">Programs Offered</p>
+                    <h2 class="section-title h3 mb-4">Academic programs</h2>
+                    <div class="row g-3">
+                        {% for program in programs %}
+                            <div class="col-md-6">
+                                <div class="list-card h-100">
+                                    <div class="department-code">{{ program.program_code }}</div>
+                                    <h3 class="h6 mt-2 mb-2">{{ program.program_code }} - {{ program.program_name }}</h3>
+                                    {% if program.description %}
+                                        <p class="mb-0 text-secondary small">{{ program.description|truncatewords:22 }}</p>
+                                    {% else %}
+                                        <p class="mb-0 text-secondary small">Program code and full title are available for this academic offering.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="empty-state">Program information will appear here once added.</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5">
+                <div class="info-card h-100">
+                    <p class="section-eyebrow">Instructors</p>
+                    <h2 class="section-title h3 mb-4">Faculty members</h2>
+                    <div class="row g-3">
+                        {% for instructor in instructors %}
+                            <div class="col-sm-6">
+                                <div class="person-card h-100 text-center">
+                                    <div class="person-photo-wrap mx-auto mb-3">
+                                        {% if instructor.photo %}
+                                            <img src="{{ instructor.photo.url }}" alt="{{ instructor.full_name }}" class="person-photo">
+                                        {% else %}
+                                            <div class="person-photo-placeholder">{{ instructor.full_name|slice:":1" }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <h3 class="h6 mb-0">{{ instructor.full_name }}</h3>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="empty-state">Instructor profiles will appear here once available.</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Department Updates" title="Announcements and news" description="Recent department updates published for public viewing." %}
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="info-card h-100">
+                    <p class="section-eyebrow">Announcements</p>
+                    <h2 class="section-title h3 mb-4">Department announcements</h2>
+                    <div class="vstack gap-3">
+                        {% for announcement in announcements %}
+                            <article class="content-list-item">
+                                <div class="content-meta">{{ announcement.date_posted|date:"M d, Y" }}</div>
+                                <h3 class="h5 mt-2 mb-2">{{ announcement.title }}</h3>
+                                <p class="mb-0 text-secondary">{{ announcement.content|truncatewords:28 }}</p>
+                            </article>
+                        {% empty %}
+                            <div class="empty-state">Department announcements will appear here once posted.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="info-card h-100">
+                    <p class="section-eyebrow">News</p>
+                    <h2 class="section-title h3 mb-4">Department news</h2>
+                    <div class="vstack gap-3">
+                        {% for item in news_items %}
+                            <article class="content-list-item">
+                                <div class="content-meta">{{ item.date_posted|date:"M d, Y" }}</div>
+                                <h3 class="h5 mt-2 mb-2">{{ item.title }}</h3>
+                                <p class="mb-0 text-secondary">{{ item.content|plain_richtext|truncatewords:28 }}</p>
+                            </article>
+                        {% empty %}
+                            <div class="empty-state">Department news will appear here once published.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-muted">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Events" title="Department events" description="Scheduled activities, public events, and department-led engagements." %}
+        <div class="row g-4 mt-1">
+            {% for event in events %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="card h-100 content-card border-0 shadow-sm">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top content-card-image" alt="{{ event.title }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="content-meta">{{ event.event_date|date:"M d, Y | h:i A" }}</div>
+                            <h3 class="h5 card-title mt-2">{{ event.title }}</h3>
+                            <p class="text-secondary mb-2">{{ event.location }}</p>
+                            <p class="card-text text-secondary mb-0">{{ event.description|truncatewords:22 }}</p>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Department events will appear here once scheduled.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-muted">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Public Alumni" title="Alumni highlights" description="Approved alumni profiles shared publicly by the department." %}
+        <div class="row g-4 mt-1">
+            {% for alumnus in public_alumni %}
+                <div class="col-md-6 col-xl-3">
+                    <div class="card h-100 border-0 shadow-sm alumni-card">
+                        <div class="card-body">
+                            <div class="person-photo-wrap mb-3">
+                                {% if alumnus.photo %}
+                                    <img src="{{ alumnus.photo.url }}" alt="{{ alumnus.full_name }}" class="person-photo">
+                                {% else %}
+                                    <div class="person-photo-placeholder">{{ alumnus.full_name|slice:":1" }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="content-meta">Batch {{ alumnus.batch_year }}</div>
+                            <h3 class="h5 mt-2 mb-2">{{ alumnus.full_name }}</h3>
+                            <p class="mb-2 text-secondary">{{ alumnus.course_program }}</p>
+                            {% if alumnus.job_title or alumnus.company_name %}
+                                <p class="mb-0 small text-secondary">
+                                    {% if alumnus.job_title %}{{ alumnus.job_title }}{% endif %}
+                                    {% if alumnus.job_title and alumnus.company_name %} at {% endif %}
+                                    {% if alumnus.company_name %}{{ alumnus.company_name }}{% endif %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Public alumni profiles will appear here when approved for public display.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load content_richtext %}
+
+{% block title %}Updates | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">Public Updates</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">University updates</h1>
+                <p class="portal-page-copy mb-0">
+                    Browse announcements, additional news, and events shared across active departments. The 4 newest news stories are featured on the homepage carousel.
+                </p>
+            </div>
+            <div class="portal-meta-chip">
+                <span class="portal-meta-label">Live Sections</span>
+                <strong>{{ latest_announcements|length }} announcements</strong><br>
+                <strong>{{ latest_news|length }} more news items</strong><br>
+                <strong>{{ latest_events|length }} events</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="announcements" class="section-block pt-0">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Announcements" title="Latest announcements" description="Recent official notices shared by the university and its departments." %}
+        <div class="row g-4 mt-1">
+            {% for announcement in latest_announcements %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="card h-100 content-card border-0 shadow-sm">
+                        {% if announcement.image %}
+                            <img src="{{ announcement.image.url }}" class="card-img-top content-card-image" alt="{{ announcement.title }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="content-meta">{{ announcement.department.name }} | {{ announcement.date_posted|date:"M d, Y" }}</div>
+                            <h3 class="h5 card-title mt-2">{{ announcement.title }}</h3>
+                            <p class="card-text text-secondary mb-0">{{ announcement.content|truncatewords:24 }}</p>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Announcements will appear here once published.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="news" class="section-block section-muted">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="News" title="More news updates" description="These stories exclude the 4 newest homepage headlines so the same items do not appear twice." %}
+        <div class="row g-4 mt-1">
+            {% for item in latest_news %}
+                <div class="col-lg-6">
+                    <article class="card h-100 content-card border-0 shadow-sm">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top content-card-image" alt="{{ item.title }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="content-meta">{{ item.department.name }} | {{ item.date_posted|date:"M d, Y" }}</div>
+                            <h3 class="h5 card-title mt-2">{{ item.title }}</h3>
+                            <div class="richtext-content mt-2">
+                                {{ item.content|safe_richtext }}
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">The latest 4 news stories are currently featured on the homepage carousel. More news updates will appear here once additional stories are published.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="events" class="section-block">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Events" title="Upcoming and recent events" description="Academic gatherings, public activities, and department-led events." %}
+        <div class="row g-4 mt-1">
+            {% for event in latest_events %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="card h-100 content-card border-0 shadow-sm">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top content-card-image" alt="{{ event.title }}">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="content-meta">{{ event.department.name }} | {{ event.event_date|date:"M d, Y | h:i A" }}</div>
+                            <h3 class="h5 card-title mt-2">{{ event.title }}</h3>
+                            <p class="text-secondary mb-2">{{ event.location }}</p>
+                            <p class="card-text text-secondary mb-0">{{ event.description|truncatewords:22 }}</p>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Events will appear here once posted.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

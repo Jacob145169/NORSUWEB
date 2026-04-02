@@ -1,0 +1,4 @@
+Django>=5.1,<6.0
+mysqlclient>=2.2
+Pillow>=10.0
+python-dotenv>=1.0

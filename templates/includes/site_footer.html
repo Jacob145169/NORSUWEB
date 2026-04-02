@@ -1,0 +1,39 @@
+<footer class="site-footer mt-auto">
+    <div class="container py-5">
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-5">
+                <div class="footer-brand">
+                    <div class="site-brand-mark footer-brand-mark">NORSU</div>
+                    <div>
+                        <h2 class="h5 mb-2 text-white">Negros Oriental State University</h2>
+                        <p class="mb-0 footer-copy">
+                            Official university information website for institutional content, departmental updates, and academic public information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <h3 class="footer-heading">Explore</h3>
+                <ul class="footer-links">
+                    <li><a href="{% url 'core:mission' %}">Mission</a></li>
+                    <li><a href="{% url 'core:vision' %}">Vision</a></li>
+                    <li><a href="{% url 'core:history' %}">History</a></li>
+                    <li><a href="{% url 'departments:list' %}">Departments</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <h3 class="footer-heading">Access</h3>
+                <ul class="footer-links">
+                    <li><a href="{% url 'accounts:login' %}">Admin Portal</a></li>
+                    <li><a href="{% url 'core:updates' %}#announcements">Announcements</a></li>
+                    <li><a href="{% url 'core:updates' %}#news">News</a></li>
+                    <li><a href="{% url 'core:updates' %}#events">Events</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2 pt-4 mt-4">
+            <p class="mb-0">&copy; {% now "Y" %} Negros Oriental State University</p>
+            <p class="mb-0">NORSU BSC Website</p>
+        </div>
+    </div>
+</footer>

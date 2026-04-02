@@ -1,0 +1,233 @@
+{% extends "accounts/dashboard_base.html" %}
+{% load content_richtext %}
+
+{% block dashboard_content %}
+<section class="row g-4 g-xl-5 department-dashboard" style="--department-theme: {{ department.theme_color|default:'#12345b' }};">
+    <div class="col-xl-3">
+        <div class="dashboard-sidebar sticky-xl-top">
+            <div class="info-card department-dashboard-sidebar">
+                <div class="department-logo-wrap department-logo-wrap-lg mb-3">
+                    {% if department.logo %}
+                        <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
+                    {% else %}
+                        <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                            {{ department.code }}
+                        </div>
+                    {% endif %}
+                </div>
+                <p class="section-eyebrow">Department Admin</p>
+                <h1 class="section-title h3 mb-3">{{ department.name }}</h1>
+                <p class="text-secondary mb-4">
+                    Shared dashboard layout for department admins, customized only by your department branding and department-scoped data.
+                </p>
+                <nav class="dashboard-side-nav">
+                    <a href="#overview" class="dashboard-side-link department-side-link">Overview</a>
+                    <a href="#programs" class="dashboard-side-link department-side-link">Programs</a>
+                    <a href="#instructors" class="dashboard-side-link department-side-link">Instructors</a>
+                    <a href="#announcements" class="dashboard-side-link department-side-link">Announcements</a>
+                    <a href="#news" class="dashboard-side-link department-side-link">News</a>
+                    <a href="#events" class="dashboard-side-link department-side-link">Events</a>
+                    <a href="#alumni" class="dashboard-side-link department-side-link">Alumni</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-9">
+        <section id="overview" class="mb-4 mb-xl-5">
+            <div class="info-card department-hero-card mb-4">
+                <p class="section-eyebrow">Department Overview</p>
+                <h2 class="section-title mb-3">{{ department.name }} dashboard</h2>
+                <p class="mb-3 text-secondary">
+                    {{ department.description|default:"Manage and review records connected to your assigned department through one consistent dashboard experience." }}
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge text-bg-light border px-3 py-2">{{ department.code }}</span>
+                    <span class="badge text-bg-light border px-3 py-2">Theme {{ department.theme_color }}</span>
+                    <a href="{% url 'accounts:program_list' %}" class="btn btn-outline-primary btn-sm">Manage Programs</a>
+                    <a href="{% url 'accounts:instructor_list' %}" class="btn btn-outline-primary btn-sm">Manage Instructors</a>
+                    <a href="{% url 'accounts:announcement_list' %}" class="btn btn-outline-primary btn-sm">Manage Announcements</a>
+                    <a href="{% url 'accounts:news_list' %}" class="btn btn-outline-primary btn-sm">Manage News</a>
+                    <a href="{% url 'accounts:event_list' %}" class="btn btn-outline-primary btn-sm">Manage Events</a>
+                    <a href="{% url 'accounts:alumni_list' %}" class="btn btn-outline-primary btn-sm">Manage Alumni</a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for stat in overview_stats %}
+                    <div class="col-sm-6 col-xxl-4">
+                        <div class="dashboard-stat-card department-stat-card h-100">
+                            <div class="dashboard-stat-value">{{ stat.value }}</div>
+                            <div class="dashboard-stat-label">{{ stat.label }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">Management Scope</p>
+                <h2 class="section-title mb-0">Department-limited responsibilities</h2>
+            </div>
+            <div class="row g-4 mt-1">
+                {% for section in management_sections %}
+                    <div class="col-lg-4">
+                        <div class="dashboard-panel h-100">
+                            <h3 class="h5 mb-3">{{ section.title }}</h3>
+                            <p class="mb-0 text-secondary">{{ section.description }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="programs" class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">Programs</p>
+                <h2 class="section-title mb-0">Department programs</h2>
+            </div>
+            <div class="row g-4 mt-1">
+                {% for program in programs %}
+                    <div class="col-md-6">
+                        <div class="list-card h-100">
+                            <div class="department-code">{{ program.program_code }}</div>
+                            <h3 class="h6 mt-2 mb-2">{{ program.program_code }} - {{ program.program_name }}</h3>
+                            <p class="mb-0 text-secondary small">
+                                {{ program.description|default:"Program record available for this department."|truncatewords:20 }}
+                            </p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="empty-state">No program records are currently assigned to this department.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="instructors" class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">Instructors</p>
+                <h2 class="section-title mb-0">Department instructors</h2>
+            </div>
+            <div class="row g-4 mt-1">
+                {% for instructor in instructors %}
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="person-card h-100 text-center">
+                            <div class="person-photo-wrap mx-auto mb-3">
+                                {% if instructor.photo %}
+                                    <img src="{{ instructor.photo.url }}" alt="{{ instructor.full_name }}" class="person-photo">
+                                {% else %}
+                                    <div class="person-photo-placeholder">{{ instructor.full_name|slice:":1" }}</div>
+                                {% endif %}
+                            </div>
+                            <h3 class="h6 mb-0">{{ instructor.full_name }}</h3>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="empty-state">No instructor records are currently assigned to this department.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="announcements" class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">Announcements</p>
+                <h2 class="section-title mb-0">Recent announcements</h2>
+            </div>
+            <div class="vstack gap-3 mt-3">
+                {% for announcement in announcements %}
+                    <article class="content-list-item">
+                        <div class="content-meta">{{ announcement.date_posted|date:"M d, Y" }}</div>
+                        <h3 class="h5 mt-2 mb-2">{{ announcement.title }}</h3>
+                        <p class="mb-0 text-secondary">{{ announcement.content|truncatewords:28 }}</p>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">No announcement records are currently available for this department.</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="news" class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">News</p>
+                <h2 class="section-title mb-0">Recent news</h2>
+            </div>
+            <div class="vstack gap-3 mt-3">
+                {% for item in news_items %}
+                    <article class="content-list-item">
+                        <div class="content-meta">{{ item.date_posted|date:"M d, Y" }}</div>
+                        <h3 class="h5 mt-2 mb-2">{{ item.title }}</h3>
+                        <p class="mb-0 text-secondary">{{ item.content|plain_richtext|truncatewords:28 }}</p>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">No news records are currently available for this department.</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="events" class="mb-4 mb-xl-5">
+            <div class="section-heading">
+                <p class="section-eyebrow">Events</p>
+                <h2 class="section-title mb-0">Upcoming and recent events</h2>
+            </div>
+            <div class="row g-4 mt-1">
+                {% for event in events %}
+                    <div class="col-md-6">
+                        <div class="dashboard-panel h-100">
+                            <div class="content-meta">{{ event.event_date|date:"M d, Y | h:i A" }}</div>
+                            <h3 class="h5 mt-2 mb-2">{{ event.title }}</h3>
+                            <p class="text-secondary mb-2">{{ event.location }}</p>
+                            <p class="mb-0 text-secondary">{{ event.description|truncatewords:24 }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="empty-state">No event records are currently available for this department.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="alumni">
+            <div class="section-heading">
+                <p class="section-eyebrow">Alumni</p>
+                <h2 class="section-title mb-0">Department alumni records</h2>
+            </div>
+            <div class="row g-4 mt-1">
+                {% for alumnus in alumni_items %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100 border-0 shadow-sm alumni-card">
+                            <div class="card-body">
+                                <div class="person-photo-wrap mb-3">
+                                    {% if alumnus.photo %}
+                                        <img src="{{ alumnus.photo.url }}" alt="{{ alumnus.full_name }}" class="person-photo">
+                                    {% else %}
+                                        <div class="person-photo-placeholder">{{ alumnus.full_name|slice:":1" }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="content-meta">Batch {{ alumnus.batch_year }}</div>
+                                <h3 class="h5 mt-2 mb-2">{{ alumnus.full_name }}</h3>
+                                <p class="mb-2 text-secondary">{{ alumnus.course_program }}</p>
+                                {% if alumnus.job_title or alumnus.company_name %}
+                                    <p class="mb-0 small text-secondary">
+                                        {% if alumnus.job_title %}{{ alumnus.job_title }}{% endif %}
+                                        {% if alumnus.job_title and alumnus.company_name %} at {% endif %}
+                                        {% if alumnus.company_name %}{{ alumnus.company_name }}{% endif %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="empty-state">No alumni records are currently assigned to this department.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}

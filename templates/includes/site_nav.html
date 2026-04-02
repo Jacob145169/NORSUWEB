@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand-lg site-navbar shadow-sm" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand site-brand" href="{% url 'core:home' %}">
+            <span class="site-brand-mark">NORSU</span>
+            <span class="site-brand-copy">
+                <span class="site-brand-title">Negros Oriental State University</span>
+                <span class="site-brand-subtitle">Official University Website</span>
+            </span>
+        </a>
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNav"
+            aria-controls="mainNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            {% with current_view=request.resolver_match.view_name current_app=request.resolver_match.app_name %}
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link{% if current_view == 'core:home' %} is-active{% endif %}" href="{% url 'core:home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_view == 'core:mission' %} is-active{% endif %}" href="{% url 'core:mission' %}">Mission</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_view == 'core:vision' %} is-active{% endif %}" href="{% url 'core:vision' %}">Vision</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_view == 'core:history' %} is-active{% endif %}" href="{% url 'core:history' %}">History</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_view == 'core:updates' %} is-active{% endif %}" href="{% url 'core:updates' %}">Updates</a></li>
+                <li class="nav-item"><a class="nav-link{% if current_app == 'departments' %} is-active{% endif %}" href="{% url 'departments:list' %}">Departments</a></li>
+                <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                    <a class="btn btn-sm btn-light site-nav-cta" href="{% url 'accounts:login' %}">Admin Portal</a>
+                </li>
+            </ul>
+            {% endwith %}
+        </div>
+    </div>
+</nav>

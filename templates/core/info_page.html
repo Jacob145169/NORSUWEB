@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ browser_title }} | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">University Profile</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">{{ page_heading }}</h1>
+                <p class="portal-page-copy mb-0">{{ page_description }}</p>
+            </div>
+            <div class="portal-meta-chip">
+                <span class="portal-meta-label">Explore Next</span>
+                <div class="d-flex flex-column gap-2">
+                    <a class="text-decoration-none" href="{% url 'core:updates' %}">University Updates</a>
+                    <a class="text-decoration-none" href="{% url 'departments:list' %}">Departments Directory</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="history-card">
+                    <p class="section-eyebrow">{{ section_label }}</p>
+                    <h2 class="section-title">{{ section_title }}</h2>
+                    <div class="mb-0 text-secondary fs-5">
+                        {% if page_content %}
+                            {{ page_content|linebreaksbr }}
+                        {% else %}
+                            {{ fallback_content }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

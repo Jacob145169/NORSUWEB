@@ -1,0 +1,29 @@
+{% extends "accounts/dashboard_base.html" %}
+
+{% block dashboard_content %}
+<section class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="info-card">
+            <p class="section-eyebrow">Department Management</p>
+            <h1 class="section-title mb-3">{{ page_title }}</h1>
+            <p class="text-secondary mb-4">
+                {{ page_description }} This cannot be undone from this page.
+            </p>
+
+            <div class="dashboard-panel mb-4">
+                <div class="department-code">{{ object.code }}</div>
+                <h2 class="h5 mt-2 mb-2">{{ object.name }}</h2>
+                <p class="mb-0 text-secondary">{{ object.description|default:"No department description provided." }}</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <button type="submit" class="btn btn-danger px-4">Delete Department</button>
+                    <a href="{% url 'accounts:department_list' %}" class="btn btn-outline-primary px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

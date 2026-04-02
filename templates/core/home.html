@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load content_richtext %}
+
+{% block title %}Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4 g-lg-5">
+            <div class="col-lg-7">
+                <span class="hero-kicker">Negros Oriental State University</span>
+                <h1 class="display-4 fw-bold hero-title mt-3 mb-3">
+                    Shaping future-ready learners through meaningful education.
+                </h1>
+                <p class="lead hero-copy mb-4">
+                    Explore the university's academic direction, public updates, community milestones, and the six colleges that shape its learning environment.
+                </p>
+                <div class="d-flex flex-column flex-sm-row gap-3">
+                    <a class="btn btn-primary btn-lg px-4" href="{% url 'departments:list' %}">Explore Departments</a>
+                    <a class="btn btn-outline-primary btn-lg px-4" href="{% url 'core:updates' %}">Latest Updates</a>
+                </div>
+                <div class="row g-3 mt-4 hero-stat-grid">
+                    <div class="col-sm-4">
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value">{{ departments|length }}</div>
+                            <div class="hero-stat-label">Academic Units</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value">{{ latest_announcements|length }}</div>
+                            <div class="hero-stat-label">Recent Announcements</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="hero-stat-card">
+                            <div class="hero-stat-value">{{ latest_events|length }}</div>
+                            <div class="hero-stat-label">Highlighted Events</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="hero-panel p-4 p-md-5">
+                    <div class="hero-panel-badge mb-3">Academic Excellence</div>
+                    <h2 class="h4 mb-3">A public-facing university information hub</h2>
+                    <p class="mb-0 text-secondary">
+                        Designed to present essential school information, showcase colleges and programs, and keep visitors informed through announcements, news, and events.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-muted">
+    <div class="container">
+        {% url 'core:updates' as updates_url %}
+        {% include "includes/section_header.html" with eyebrow="Latest News" title="Top stories from across the university" description="The homepage always highlights the 4 most recent news posts. When a new story is published, it automatically enters this carousel and the oldest featured story moves out." action_label="View More Updates" action_href=updates_url %}
+        {% if featured_news %}
+            <div id="homepageNewsCarousel" class="carousel slide news-carousel" aria-label="Latest news carousel">
+                <div class="carousel-indicators news-carousel-indicators">
+                    {% for item in featured_news %}
+                        <button
+                            type="button"
+                            data-bs-target="#homepageNewsCarousel"
+                            data-bs-slide-to="{{ forloop.counter0 }}"
+                            class="{% if forloop.first %}active{% endif %}"
+                            {% if forloop.first %}aria-current="true"{% endif %}
+                            aria-label="Show news item {{ forloop.counter }}: {{ item.title }}"
+                        ></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    {% for item in featured_news %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <article class="news-carousel-card">
+                                <div class="row g-0 align-items-stretch">
+                                    <div class="col-lg-5">
+                                        {% if item.image %}
+                                            <img src="{{ item.image.url }}" class="news-carousel-image" alt="{{ item.title }}">
+                                        {% else %}
+                                            <div class="news-carousel-image-placeholder">
+                                                <span>Latest News</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-lg-7">
+                                        <div class="news-carousel-body">
+                                            <div class="content-meta">{{ item.department.name }} | {{ item.date_posted|date:"M d, Y" }}</div>
+                                            <h3 class="news-carousel-title mt-3">{{ item.title }}</h3>
+                                            <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
+                                                {{ item.content|safe_richtext }}
+                                            </div>
+                                            <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mt-4">
+                                                <a class="btn btn-primary" href="{% url 'core:updates' %}#news">More News</a>
+                                                <span class="news-carousel-count">Story {{ forloop.counter }} of {{ featured_news|length }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if featured_news|length > 1 %}
+                    <button class="carousel-control-prev news-carousel-control" type="button" data-bs-target="#homepageNewsCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous story</span>
+                    </button>
+                    <button class="carousel-control-next news-carousel-control" type="button" data-bs-target="#homepageNewsCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next story</span>
+                    </button>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="empty-state">Latest news stories will appear here once published.</div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Quick Access" title="Featured departments" description="Jump straight into the university's active public department pages." %}
+        <div class="row g-4 mt-1">
+            {% for department in departments|slice:":6" %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 department-card border-0 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="department-logo-wrap mb-3">
+                                {% if department.logo %}
+                                    <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
+                                {% else %}
+                                    <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                        {{ department.code }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="department-code">{{ department.code }}</div>
+                            <h3 class="h5 card-title mt-2">{{ department.name }}</h3>
+                            <p class="card-text text-secondary flex-grow-1">
+                                {{ department.description|default:"Explore programs, faculty, and updates from this department."|truncatewords:22 }}
+                            </p>
+                            <a class="btn btn-outline-primary mt-2 align-self-start" href="{% url 'departments:detail' department.slug %}">
+                                View Department
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Department information will appear here once seeded.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

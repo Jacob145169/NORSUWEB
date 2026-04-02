@@ -1,0 +1,55 @@
+{% extends "accounts/dashboard_base.html" %}
+
+{% block dashboard_content %}
+<section class="row justify-content-center">
+    <div class="col-xl-11">
+        <div class="info-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                <div>
+                    <p class="section-eyebrow">Departments</p>
+                    <h1 class="section-title mb-2">{{ page_title }}</h1>
+                    <p class="mb-0 text-secondary">{{ page_description }}</p>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <a href="{% url 'accounts:super_admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+                    <a href="{% url 'accounts:department_create' %}" class="btn btn-primary">Add Department</a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for department in departments %}
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card h-100 department-card border-0 shadow-sm">
+                            <div class="card-body d-flex flex-column">
+                                <div class="department-logo-wrap mb-3">
+                                    {% if department.logo %}
+                                        <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
+                                    {% else %}
+                                        <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                            {{ department.code }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="department-code">{{ department.code }}</div>
+                                <h2 class="h5 mt-2 mb-2">{{ department.name }}</h2>
+                                <p class="text-secondary flex-grow-1 mb-3">
+                                    {{ department.description|default:"No department overview has been provided yet."|truncatewords:22 }}
+                                </p>
+                                <div class="small text-secondary mb-3">Theme Color: {{ department.theme_color }}</div>
+                                <div class="d-flex flex-wrap gap-2 mt-auto">
+                                    <a href="{% url 'accounts:department_update' department.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    <a href="{% url 'accounts:department_delete' department.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="empty-state">No departments have been added yet.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

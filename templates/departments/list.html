@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Departments | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">Academic Units</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">Departments and colleges</h1>
+                <p class="portal-page-copy mb-0">
+                    Explore the university's active departments, their public profiles, and the academic communities they represent.
+                </p>
+            </div>
+            <div class="portal-meta-chip">
+                <span class="portal-meta-label">Active Directory</span>
+                <strong>{{ departments|length }}</strong><br>
+                <span>public department pages</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Departments" title="Colleges and academic units" description="Browse public department pages for programs, faculty, updates, and alumni highlights." %}
+        <div class="row g-4 mt-1">
+            {% for department in departments %}
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 department-card border-0 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <div class="department-logo-wrap mb-3">
+                                {% if department.logo %}
+                                    <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
+                                {% else %}
+                                    <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                        {{ department.code }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="department-code">{{ department.code }}</div>
+                            <h2 class="h5 card-title mt-2">{{ department.name }}</h2>
+                            <p class="card-text text-secondary flex-grow-1">
+                                {{ department.description|default:"Explore programs, faculty, and updates from this department."|truncatewords:22 }}
+                            </p>
+                            <a class="btn btn-outline-primary mt-2 align-self-start" href="{% url 'departments:detail' department.slug %}">
+                                View Department
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">Department information will appear here once it is added.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
