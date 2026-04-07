@@ -1,78 +1,214 @@
 {% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<section class="row justify-content-center">
+<section class="row justify-content-center mt-4 mt-lg-5">
     <div class="col-xl-11">
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                <div>
-                    <p class="section-eyebrow">Alumni</p>
-                    <h1 class="section-title mb-2">{{ page_title }}</h1>
-                    <p class="mb-0 text-secondary">{{ page_description }}</p>
+        <div class="mission-vision-card">
+            <div class="mission-vision-card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                    <div>
+                        <p class="section-eyebrow">Alumni</p>
+                        <h1 class="section-title mb-2">{{ page_title }}</h1>
+                        <p class="mb-0 text-secondary">{{ page_description }}</p>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+                        <a href="{{ export_pdf_url }}" class="btn btn-outline-primary">Export PDF</a>
+                        <a href="{% url 'accounts:alumni_create' %}" class="btn btn-primary">Add Alumni</a>
+                    </div>
                 </div>
-                <div class="d-flex flex-column flex-sm-row gap-2">
-                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
-                    <a href="{% url 'accounts:alumni_create' %}" class="btn btn-primary">Add Alumni</a>
-                </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 program-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Alumni</th>
-                            <th scope="col">Department</th>
-                            <th scope="col">Contact</th>
-                            <th scope="col">Visibility</th>
-                            <th scope="col" class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for alumnus in alumni_items %}
+                <form method="get" class="row g-3 align-items-end mb-4">
+                    <div class="col-lg-5">
+                        <label for="alumni-search" class="form-label">Search Alumni</label>
+                        <input
+                            type="search"
+                            id="alumni-search"
+                            name="q"
+                            value="{{ search_query }}"
+                            class="form-control"
+                            placeholder="Search by name, ID number, batch, or course"
+                        >
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <label for="alumni-batch-filter" class="form-label">Filter by Batch</label>
+                        <select id="alumni-batch-filter" name="batch" class="form-select" size="1">
+                            <option value="">All Batches</option>
+                            {% for batch in batch_options %}
+                                <option value="{{ batch }}" {% if selected_batch == batch|stringformat:"s" %}selected{% endif %}>{{ batch }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 col-lg-3">
+                        <label for="alumni-course-filter" class="form-label">Filter by Course</label>
+                        <select id="alumni-course-filter" name="course" class="form-select">
+                            <option value="">All Courses</option>
+                            {% for course in course_options %}
+                                <option value="{{ course.value }}" {% if selected_course == course.value %}selected{% endif %}>{{ course.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if has_active_filters %}
+                        <div class="col-12">
+                            <a href="{% url 'accounts:alumni_list' %}" class="btn btn-outline-primary btn-sm">Clear Filters</a>
+                        </div>
+                    {% endif %}
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 program-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div class="fw-semibold">{{ alumnus.full_name }}</div>
-                                    <div class="small text-secondary">
-                                        Batch {{ alumnus.batch_year }} | {{ alumnus.course_program }}
-                                    </div>
-                                    {% if alumnus.job_title or alumnus.company_name %}
+                                <th scope="col">Alumni</th>
+                                <th scope="col">ID Number</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumnus in alumni_items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ alumnus.full_name }}</div>
                                         <div class="small text-secondary">
-                                            {% if alumnus.job_title %}{{ alumnus.job_title }}{% endif %}
-                                            {% if alumnus.job_title and alumnus.company_name %} at {% endif %}
-                                            {% if alumnus.company_name %}{{ alumnus.company_name }}{% endif %}
+                                            Batch {{ alumnus.batch_year }} | {{ alumnus.course_program }}
                                         </div>
-                                    {% endif %}
-                                </td>
-                                <td>{{ alumnus.department.name }}</td>
-                                <td>
-                                    <div>{{ alumnus.email }}</div>
-                                    <div class="small text-secondary">{{ alumnus.contact_number }}</div>
-                                </td>
-                                <td>
-                                    {% if alumnus.is_public %}
-                                        <span class="badge text-bg-success">Public</span>
-                                    {% else %}
-                                        <span class="badge text-bg-secondary">Private</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-end">
-                                    <div class="d-inline-flex flex-wrap justify-content-end gap-2">
-                                        <a href="{% url 'accounts:alumni_update' alumnus.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        <a href="{% url 'accounts:alumni_delete' alumnus.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="5">
-                                    <div class="empty-state my-3">No alumni records are available yet.</div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                        {% if alumnus.job_title or alumnus.company_name %}
+                                            <div class="small text-secondary">
+                                                {% if alumnus.job_title %}{{ alumnus.job_title }}{% endif %}
+                                                {% if alumnus.job_title and alumnus.company_name %} at {% endif %}
+                                                {% if alumnus.company_name %}{{ alumnus.company_name }}{% endif %}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div>{{ alumnus.id_number|default:"Not set" }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ alumnus.email }}</div>
+                                        <div class="small text-secondary">{{ alumnus.contact_number }}</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex flex-wrap justify-content-end gap-2">
+                                            <a
+                                                href="{% url 'accounts:alumni_update' alumnus.pk %}"
+                                                class="table-icon-action table-icon-action--edit"
+                                                aria-label="Edit {{ alumnus.full_name }}"
+                                                title="Edit"
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                    <path d="M4 20h4.75L19 9.75 14.25 5 4 15.25V20Zm2-1.5v-2.63l8.25-8.25 2.63 2.63-8.25 8.25H6ZM18.3 8.33l-2.63-2.63 1.03-1.02a1.5 1.5 0 0 1 2.12 0l.5.5a1.5 1.5 0 0 1 0 2.12L18.3 8.33Z"/>
+                                                </svg>
+                                                <span class="visually-hidden">Edit</span>
+                                            </a>
+                                            <button
+                                                type="button"
+                                                class="table-icon-action table-icon-action--delete"
+                                                aria-label="Delete {{ alumnus.full_name }}"
+                                                title="Delete"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#alumniDeleteModal{{ alumnus.pk }}"
+                                            >
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                    <path d="M9 3.75h6a1 1 0 0 1 1 1V6h3a.75.75 0 0 1 0 1.5h-1.04l-.77 11.01A2.5 2.5 0 0 1 14.7 21H9.3a2.5 2.5 0 0 1-2.49-2.49L6.04 7.5H5a.75.75 0 0 1 0-1.5h3V4.75a1 1 0 0 1 1-1Zm.5 2.25h5V5.25h-5V6Zm-1.19 1.5.74 10.91a1 1 0 0 0 1 .94h5.9a1 1 0 0 0 1-.94l.74-10.91H8.31ZM10.5 10a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0v-5.5A.75.75 0 0 1 10.5 10Zm3 0a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0v-5.5A.75.75 0 0 1 13.5 10Z"/>
+                                                </svg>
+                                                <span class="visually-hidden">Delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state my-3">
+                                            {% if has_active_filters %}
+                                                No alumni records match the current search or filters.
+                                            {% else %}
+                                                No alumni records are available yet.
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+{% for alumnus in alumni_items %}
+<div
+    class="modal fade"
+    id="alumniDeleteModal{{ alumnus.pk }}"
+    tabindex="-1"
+    aria-labelledby="alumniDeleteModalLabel{{ alumnus.pk }}"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content department-program-modal">
+            <div class="modal-header border-0 department-program-modal-header">
+                <div class="department-program-modal-heading">
+                    <p class="section-eyebrow mb-0">Delete Alumni</p>
+                    <h2 class="modal-title department-program-modal-title mb-0" id="alumniDeleteModalLabel{{ alumnus.pk }}">{{ alumnus.full_name }}</h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="department-program-modal-copy">
+                    <p>This will permanently remove this alumni record.</p>
+                    <p class="mb-0">ID Number: {{ alumnus.id_number|default:"Not set" }} | Batch {{ alumnus.batch_year }}</p>
+                </div>
+                <form method="post" action="{% url 'accounts:alumni_delete' alumnus.pk %}" class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">Delete Record</button>
+                    <button type="button" class="btn btn-outline-primary px-4" data-bs-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const batchFilter = document.getElementById("alumni-batch-filter");
+    const courseFilter = document.getElementById("alumni-course-filter");
+    if (!batchFilter) {
+        return;
+    }
+
+    const expandedSize = Math.min(5, batchFilter.options.length || 5);
+    const collapseBatchFilter = () => {
+        batchFilter.size = 1;
+    };
+    const expandBatchFilter = () => {
+        batchFilter.size = expandedSize;
+    };
+
+    collapseBatchFilter();
+    batchFilter.addEventListener("focus", expandBatchFilter);
+    batchFilter.addEventListener("mousedown", expandBatchFilter);
+    batchFilter.addEventListener("change", collapseBatchFilter);
+    batchFilter.addEventListener("blur", collapseBatchFilter);
+    batchFilter.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" || event.key === "Tab" || event.key === "Enter") {
+            collapseBatchFilter();
+        }
+    });
+    batchFilter.addEventListener("change", () => {
+        batchFilter.form?.requestSubmit();
+    });
+
+    if (courseFilter) {
+        courseFilter.addEventListener("change", () => {
+            courseFilter.form?.requestSubmit();
+        });
+    }
+});
+</script>
 {% endblock %}

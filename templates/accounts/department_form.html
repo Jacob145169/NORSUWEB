@@ -43,6 +43,60 @@
                             </div>
                         {% endif %}
                     </div>
+                    <div class="col-12">
+                        <label for="{{ form.mission.id_for_label }}" class="form-label">Mission</label>
+                        {{ form.mission }}
+                        {% if form.mission.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.mission.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.vision.id_for_label }}" class="form-label">Vision</label>
+                        {{ form.vision }}
+                        {% if form.vision.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.vision.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.dean_name.id_for_label }}" class="form-label">Dean</label>
+                        {{ form.dean_name }}
+                        {% if form.dean_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.dean_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.dean_photo.id_for_label }}" class="form-label">Dean Photo</label>
+                        {{ form.dean_photo }}
+                        {% if form.dean_photo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.dean_photo.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.assistant_dean_name.id_for_label }}" class="form-label">Assistant Dean</label>
+                        {{ form.assistant_dean_name }}
+                        {% if form.assistant_dean_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.assistant_dean_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.assistant_dean_photo.id_for_label }}" class="form-label">Assistant Dean Photo</label>
+                        {{ form.assistant_dean_photo }}
+                        {% if form.assistant_dean_photo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.assistant_dean_photo.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
                     <div class="col-md-6">
                         <label for="{{ form.logo.id_for_label }}" class="form-label">Logo</label>
                         {{ form.logo }}

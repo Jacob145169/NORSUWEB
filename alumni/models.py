@@ -3,6 +3,7 @@ from django.db import models
 
 class Alumni(models.Model):
     full_name = models.CharField(max_length=255)
+    id_number = models.CharField(max_length=50, blank=True, default="")
     batch_year = models.PositiveIntegerField()
     course_program = models.CharField(max_length=255)
     department = models.ForeignKey(
@@ -29,4 +30,3 @@ class Alumni(models.Model):
 
     def __str__(self) -> str:
         return f"{self.full_name} ({self.batch_year})"
-

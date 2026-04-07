@@ -1,4 +1,5 @@
 from django.db import models
+import re
 
 
 class Program(models.Model):
@@ -24,6 +25,22 @@ class Program(models.Model):
 
     def __str__(self) -> str:
         return f"{self.program_code} - {self.program_name}"
+
+    @property
+    def display_name(self) -> str:
+        code = (self.program_code or "").strip()
+        name = (self.program_name or "").strip()
+        if not code or not name:
+            return name
+
+        pattern = rf"^{re.escape(code)}\s*[-:]\s*"
+        if re.match(pattern, name, flags=re.IGNORECASE):
+            return re.sub(pattern, "", name, count=1, flags=re.IGNORECASE).strip()
+
+        if name.casefold() == code.casefold():
+            return name
+
+        return name
 
 
 class Instructor(models.Model):

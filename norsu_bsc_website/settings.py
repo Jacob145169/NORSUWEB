@@ -74,9 +74,14 @@ DATABASES = {
         "PORT": "3306",
         "OPTIONS": {
             "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
+
+# MariaDB does not support Django's conditional unique constraints used by the
+# custom user model. Equivalent validation is enforced in application logic.
+SILENCED_SYSTEM_CHECKS = ["models.W036"]
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

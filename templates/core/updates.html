@@ -11,97 +11,165 @@
                 <span class="section-eyebrow">Public Updates</span>
                 <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">University updates</h1>
                 <p class="portal-page-copy mb-0">
-                    Browse announcements, additional news, and events shared across active departments. The 4 newest news stories are featured on the homepage carousel.
+                    Browse the latest announcements, homepage news, and events shared across the university. Content highlighted on the homepage also appears here.
                 </p>
             </div>
-            <div class="portal-meta-chip">
-                <span class="portal-meta-label">Live Sections</span>
-                <strong>{{ latest_announcements|length }} announcements</strong><br>
-                <strong>{{ latest_news|length }} more news items</strong><br>
-                <strong>{{ latest_events|length }} events</strong>
+        </div>
+    </div>
+</section>
+
+<section id="updates" class="section-block pt-0">
+    <div class="container">
+        {% include "includes/section_header.html" with eyebrow="Updates" title="Latest announcements and news" description="Recent official notices and news stories shared on both the homepage and the full updates page." %}
+        {% if latest_updates %}
+            <div id="updatesFeaturedCarousel" class="carousel slide news-carousel" data-bs-ride="carousel" data-bs-interval="2000" data-bs-pause="hover" aria-label="Latest updates carousel">
+                <div class="carousel-indicators news-carousel-indicators">
+                    {% for item in latest_updates %}
+                        <button
+                            type="button"
+                            data-bs-target="#updatesFeaturedCarousel"
+                            data-bs-slide-to="{{ forloop.counter0 }}"
+                            class="{% if forloop.first %}active{% endif %}"
+                            {% if forloop.first %}aria-current="true"{% endif %}
+                            aria-label="Show update {{ forloop.counter }}: {{ item.title }}"
+                        ></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    {% for item in latest_updates %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <a class="news-carousel-card-link" href="{% url 'core:update_detail' item.update_type item.pk %}" aria-label="Read more about {{ item.title }}">
+                                <article class="news-carousel-card">
+                                    <div class="row g-0 align-items-stretch">
+                                        <div class="col-lg-4 news-carousel-media">
+                                            {% if item.image %}
+                                                <img src="{{ item.image.url }}" class="news-carousel-image" alt="{{ item.title }}">
+                                            {% else %}
+                                                <div class="news-carousel-image-placeholder">
+                                                    <span>{{ item.update_kind }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="news-carousel-body">
+                                                <div class="news-carousel-meta">
+                                                    <span class="news-carousel-meta-chip">{{ item.source_label }}</span>
+                                                    <span class="news-carousel-meta-chip">{{ item.update_kind }}</span>
+                                                    <span class="news-carousel-meta-date">{{ item.date_posted|date:"M d, Y" }}</span>
+                                                </div>
+                                                <h3 class="news-carousel-title mt-3">{{ item.title }}</h3>
+                                                <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
+                                                    {{ item.content|plain_richtext }}
+                                                </div>
+                                                <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mt-4">
+                                                    <span class="news-carousel-read-more mt-0">Read More</span>
+                                                    <span class="news-carousel-count">{{ forloop.counter }} / {{ latest_updates|length }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if latest_updates|length > 1 %}
+                    <div class="news-carousel-footer">
+                        <div class="news-carousel-nav">
+                            <button class="carousel-control-prev news-carousel-control" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous update</span>
+                            </button>
+                            <button class="carousel-control-next news-carousel-control" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next update</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-        </div>
-    </div>
-</section>
-
-<section id="announcements" class="section-block pt-0">
-    <div class="container">
-        {% include "includes/section_header.html" with eyebrow="Announcements" title="Latest announcements" description="Recent official notices shared by the university and its departments." %}
-        <div class="row g-4 mt-1">
-            {% for announcement in latest_announcements %}
-                <div class="col-md-6 col-xl-4">
-                    <article class="card h-100 content-card border-0 shadow-sm">
-                        {% if announcement.image %}
-                            <img src="{{ announcement.image.url }}" class="card-img-top content-card-image" alt="{{ announcement.title }}">
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <div class="content-meta">{{ announcement.department.name }} | {{ announcement.date_posted|date:"M d, Y" }}</div>
-                            <h3 class="h5 card-title mt-2">{{ announcement.title }}</h3>
-                            <p class="card-text text-secondary mb-0">{{ announcement.content|truncatewords:24 }}</p>
-                        </div>
-                    </article>
-                </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="empty-state">Announcements will appear here once published.</div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section id="news" class="section-block section-muted">
-    <div class="container">
-        {% include "includes/section_header.html" with eyebrow="News" title="More news updates" description="These stories exclude the 4 newest homepage headlines so the same items do not appear twice." %}
-        <div class="row g-4 mt-1">
-            {% for item in latest_news %}
-                <div class="col-lg-6">
-                    <article class="card h-100 content-card border-0 shadow-sm">
-                        {% if item.image %}
-                            <img src="{{ item.image.url }}" class="card-img-top content-card-image" alt="{{ item.title }}">
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <div class="content-meta">{{ item.department.name }} | {{ item.date_posted|date:"M d, Y" }}</div>
-                            <h3 class="h5 card-title mt-2">{{ item.title }}</h3>
-                            <div class="richtext-content mt-2">
-                                {{ item.content|safe_richtext }}
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="empty-state">The latest 4 news stories are currently featured on the homepage carousel. More news updates will appear here once additional stories are published.</div>
-                </div>
-            {% endfor %}
-        </div>
+        {% else %}
+            <div class="empty-state">Announcements and news updates will appear here once published.</div>
+        {% endif %}
     </div>
 </section>
 
 <section id="events" class="section-block">
     <div class="container">
         {% include "includes/section_header.html" with eyebrow="Events" title="Upcoming and recent events" description="Academic gatherings, public activities, and department-led events." %}
-        <div class="row g-4 mt-1">
-            {% for event in latest_events %}
-                <div class="col-md-6 col-xl-4">
-                    <article class="card h-100 content-card border-0 shadow-sm">
-                        {% if event.image %}
-                            <img src="{{ event.image.url }}" class="card-img-top content-card-image" alt="{{ event.title }}">
-                        {% endif %}
-                        <div class="card-body d-flex flex-column">
-                            <div class="content-meta">{{ event.department.name }} | {{ event.event_date|date:"M d, Y | h:i A" }}</div>
-                            <h3 class="h5 card-title mt-2">{{ event.title }}</h3>
-                            <p class="text-secondary mb-2">{{ event.location }}</p>
-                            <p class="card-text text-secondary mb-0">{{ event.description|truncatewords:22 }}</p>
+        {% if latest_events %}
+            <div id="eventsFeaturedCarousel" class="carousel slide news-carousel" data-bs-ride="carousel" data-bs-interval="2000" data-bs-pause="hover" aria-label="Events carousel">
+                <div class="carousel-indicators news-carousel-indicators">
+                    {% for event in latest_events %}
+                        <button
+                            type="button"
+                            data-bs-target="#eventsFeaturedCarousel"
+                            data-bs-slide-to="{{ forloop.counter0 }}"
+                            class="{% if forloop.first %}active{% endif %}"
+                            {% if forloop.first %}aria-current="true"{% endif %}
+                            aria-label="Show event {{ forloop.counter }}: {{ event.title }}"
+                        ></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    {% for event in latest_events %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <article class="news-carousel-card">
+                                <div class="row g-0 align-items-stretch">
+                                    <div class="col-lg-4 news-carousel-media">
+                                        {% if event.image %}
+                                            <img src="{{ event.image.url }}" class="news-carousel-image" alt="{{ event.title }}">
+                                        {% else %}
+                                            <div class="news-carousel-image-placeholder">
+                                                <span>Event</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="news-carousel-body">
+                                            <div class="news-carousel-meta">
+                                                <span class="news-carousel-meta-chip">{{ event.source_label }}</span>
+                                                <span class="news-carousel-meta-chip">Event</span>
+                                                <span class="news-carousel-meta-date">{{ event.event_date|date:"M d, Y" }}</span>
+                                            </div>
+                                            <h3 class="news-carousel-title mt-3">{{ event.title }}</h3>
+                                            <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
+                                                {{ event.description|plain_richtext }}
+                                            </div>
+                                            <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mt-4">
+                                                <div class="d-flex flex-column gap-2">
+                                                    {% if event.location %}
+                                                        <span class="news-carousel-count">{{ event.location }}</span>
+                                                    {% endif %}
+                                                    <a class="btn btn-light event-carousel-button" href="{% url 'core:event_detail' event.pk %}">View Full Event</a>
+                                                </div>
+                                                <span class="news-carousel-count">{{ forloop.counter }} / {{ latest_events|length }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
                         </div>
-                    </article>
+                    {% endfor %}
                 </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="empty-state">Events will appear here once posted.</div>
-                </div>
-            {% endfor %}
-        </div>
+                {% if latest_events|length > 1 %}
+                    <div class="news-carousel-footer">
+                        <div class="news-carousel-nav">
+                            <button class="carousel-control-prev news-carousel-control" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous event</span>
+                            </button>
+                            <button class="carousel-control-next news-carousel-control" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next event</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="empty-state">Events will appear here once posted.</div>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

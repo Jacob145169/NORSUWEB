@@ -1,53 +1,64 @@
 {% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<section class="row justify-content-center">
+<section class="row justify-content-center mt-3">
     <div class="col-xl-11">
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                <div>
-                    <p class="section-eyebrow">Instructors</p>
-                    <h1 class="section-title mb-2">{{ page_title }}</h1>
-                    <p class="mb-0 text-secondary">{{ page_description }}</p>
+        <div class="mission-vision-card">
+            <div class="mission-vision-card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                    <div>
+                        <p class="section-eyebrow">Instructors</p>
+                        <h1 class="section-title mb-2">{{ page_title }}</h1>
+                        <p class="mb-0 text-secondary">{{ page_description }}</p>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-md-2">
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+                        <a href="{% url 'accounts:instructor_create' %}" class="btn btn-primary">Add Instructor</a>
+                    </div>
                 </div>
-                <div class="d-flex flex-column flex-sm-row gap-2">
-                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
-                    <a href="{% url 'accounts:instructor_create' %}" class="btn btn-primary">Add Instructor</a>
-                </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 program-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Instructor</th>
-                            <th scope="col">Department</th>
-                            <th scope="col">Photo</th>
-                            <th scope="col" class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for instructor in instructors %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 program-table">
+                        <thead>
                             <tr>
-                                <td><div class="fw-semibold">{{ instructor.full_name }}</div></td>
-                                <td>{{ instructor.department.name }}</td>
-                                <td class="text-secondary">{% if instructor.photo %}Uploaded{% else %}No photo{% endif %}</td>
-                                <td class="text-end">
-                                    <div class="d-inline-flex flex-wrap justify-content-end gap-2">
-                                        <a href="{% url 'accounts:instructor_update' instructor.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        <a href="{% url 'accounts:instructor_delete' instructor.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
-                                    </div>
-                                </td>
+                                <th scope="col">Instructor</th>
+                                <th scope="col">Department</th>
+                                <th scope="col" class="text-end">Actions</th>
                             </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="4">
-                                    <div class="empty-state my-3">No instructor records are available yet.</div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for instructor in instructors %}
+                                <tr>
+                                    <td>
+                                        <div class="table-person">
+                                            <div class="table-person-photo-wrap">
+                                                {% if instructor.photo %}
+                                                    <img src="{{ instructor.photo.url }}" alt="{{ instructor.full_name }}" class="person-photo">
+                                                {% else %}
+                                                    <div class="person-photo-placeholder">{{ instructor.full_name|slice:":1" }}</div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="fw-semibold">{{ instructor.full_name }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ instructor.department.name }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex flex-wrap justify-content-end gap-2">
+                                            <a href="{% url 'accounts:instructor_update' instructor.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                            <a href="{% url 'accounts:instructor_delete' instructor.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="empty-state my-3">No instructor records are available yet.</div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

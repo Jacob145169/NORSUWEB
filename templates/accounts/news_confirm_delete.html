@@ -21,7 +21,7 @@
                 {% csrf_token %}
                 <div class="d-flex flex-column flex-sm-row gap-3">
                     <button type="submit" class="btn btn-danger px-4">Delete News</button>
-                    <a href="{% url 'accounts:news_list' %}" class="btn btn-outline-primary px-4">Cancel</a>
+                    <a href="{% url 'accounts:update_list' %}" class="btn btn-outline-primary px-4">Cancel</a>
                 </div>
             </form>
         </div>

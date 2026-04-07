@@ -7,16 +7,8 @@
     <div class="container">
         <div class="portal-page-header-inner">
             <div>
-                <span class="section-eyebrow">University Profile</span>
-                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">{{ page_heading }}</h1>
+                <h1 class="display-5 fw-bold portal-page-title mb-3">{{ page_heading }}</h1>
                 <p class="portal-page-copy mb-0">{{ page_description }}</p>
-            </div>
-            <div class="portal-meta-chip">
-                <span class="portal-meta-label">Explore Next</span>
-                <div class="d-flex flex-column gap-2">
-                    <a class="text-decoration-none" href="{% url 'core:updates' %}">University Updates</a>
-                    <a class="text-decoration-none" href="{% url 'departments:list' %}">Departments Directory</a>
-                </div>
             </div>
         </div>
     </div>
@@ -26,16 +18,46 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-10">
-                <div class="history-card">
-                    <p class="section-eyebrow">{{ section_label }}</p>
-                    <h2 class="section-title">{{ section_title }}</h2>
-                    <div class="mb-0 text-secondary fs-5">
-                        {% if page_content %}
-                            {{ page_content|linebreaksbr }}
-                        {% else %}
-                            {{ fallback_content }}
-                        {% endif %}
-                    </div>
+                <div class="{% if is_history_page %}history-card{% else %}mission-vision-card{% endif %}">
+                    {% if is_history_page %}
+                        <div class="history-card-layout{% if history_image_url %} history-card-layout--with-media{% endif %}">
+                            <div class="history-card-copy">
+                                <p class="section-eyebrow">{{ section_label }}</p>
+                                {% if history_image_url %}
+                                    <figure class="history-card-media" aria-label="Campus photo">
+                                        <img
+                                            src="{{ history_image_url }}"
+                                            alt="Negros Oriental State University Bayawan-Sta. Catalina Campus"
+                                            class="history-card-image"
+                                        >
+                                        <figcaption class="history-card-caption">
+                                            NORSU Bayawan-Sta. Catalina Campus
+                                        </figcaption>
+                                    </figure>
+                                {% endif %}
+                                <div class="history-card-content history-card-content--timeline mb-0">
+                                    {% if page_content %}
+                                        {{ page_content|linebreaksbr }}
+                                    {% else %}
+                                        {{ fallback_content|linebreaksbr }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="mission-vision-card-body">
+                            <div class="mission-vision-card-top">
+                                <p class="section-eyebrow mb-0">{{ section_label }}</p>
+                            </div>
+                            <div class="mission-vision-copy">
+                                {% if page_content %}
+                                    {{ page_content|linebreaks }}
+                                {% else %}
+                                    {{ fallback_content|linebreaks }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -6,14 +6,14 @@
         <div class="info-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
                 <div>
-                    <p class="section-eyebrow">Landing Page Content</p>
+                    <p class="section-eyebrow">Homepage Content</p>
                     <h1 class="section-title mb-2">{{ page_title }}</h1>
                     <p class="mb-0 text-secondary">{{ page_description }}</p>
                 </div>
                 <a href="{% url 'accounts:super_admin_dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
             </div>
 
-            <form method="post" novalidate>
+            <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 <div class="row g-4">
                     <div class="col-12">
@@ -44,11 +44,64 @@
                         {% endif %}
                     </div>
                     <div class="col-12">
+                        <label for="{{ form.strategic_goals.id_for_label }}" class="form-label">Strategic Goals</label>
+                        {{ form.strategic_goals }}
+                        {% if form.strategic_goals.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.strategic_goals.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.core_values.id_for_label }}" class="form-label">Core Values</label>
+                        {{ form.core_values }}
+                        {% if form.core_values.help_text %}
+                            <div class="form-text">{{ form.core_values.help_text }}</div>
+                        {% endif %}
+                        {% if form.core_values.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.core_values.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.quality_policy.id_for_label }}" class="form-label">Quality Policy</label>
+                        {{ form.quality_policy }}
+                        {% if form.quality_policy.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.quality_policy.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
                         <label for="{{ form.history.id_for_label }}" class="form-label">History</label>
                         {{ form.history }}
                         {% if form.history.errors %}
                             <div class="invalid-feedback d-block">
                                 {% for error in form.history.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.history_image.id_for_label }}" class="form-label">History Image</label>
+                        {{ form.history_image }}
+                        {% if form.instance.history_image %}
+                            <div class="mt-3">
+                                <p class="small text-secondary mb-2">Current image preview</p>
+                                <img
+                                    src="{{ form.instance.history_image.url }}"
+                                    alt="Current history page image"
+                                    class="img-fluid rounded-4 border"
+                                    style="max-height: 18rem; object-fit: cover;"
+                                >
+                            </div>
+                        {% endif %}
+                        {% if form.history_image.help_text %}
+                            <div class="form-text">{{ form.history_image.help_text }}</div>
+                        {% endif %}
+                        {% if form.history_image.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.history_image.errors %}{{ error }}{% endfor %}
                             </div>
                         {% endif %}
                     </div>

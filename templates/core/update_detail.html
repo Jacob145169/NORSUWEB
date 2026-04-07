@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load content_richtext %}
+
+{% block title %}{{ update_item.title }} | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">{{ update_kind }}</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">{{ update_item.title }}</h1>
+                <p class="portal-page-copy mb-0">
+                    {{ update_item.source_label }} | {{ update_item.date_posted|date:"M d, Y" }}
+                </p>
+            </div>
+            <div class="mt-3 mt-lg-0">
+                <a href="{% url 'core:updates' %}#updates" class="btn btn-outline-primary">Back to Updates</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        <article class="mission-vision-card update-detail-card">
+            <div class="update-detail-card-body">
+                {% if update_item.image %}
+                    <div class="update-detail-hero mb-4">
+                        <img src="{{ update_item.image.url }}" class="update-detail-image" alt="{{ update_item.title }}">
+                    </div>
+                {% endif %}
+                <div class="update-detail-meta-row">
+                    <span class="update-detail-chip">{{ update_item.source_label }}</span>
+                    <span class="update-detail-chip">{{ update_kind }}</span>
+                    <span class="update-detail-chip">{{ update_item.date_posted|date:"M d, Y" }}</span>
+                </div>
+                <div class="richtext-content update-detail-content mt-4">
+                    {{ update_item.content|safe_richtext }}
+                </div>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

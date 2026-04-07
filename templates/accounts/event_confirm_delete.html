@@ -1,4 +1,5 @@
 {% extends "accounts/dashboard_base.html" %}
+{% load content_richtext %}
 
 {% block dashboard_content %}
 <section class="row justify-content-center">
@@ -12,9 +13,9 @@
 
             <div class="dashboard-panel mb-4">
                 <h2 class="h5 mb-2">{{ object.title }}</h2>
-                <p class="mb-2 text-secondary">{{ object.department.name }} | {{ object.event_date|date:"M d, Y | h:i A" }}</p>
+                <p class="mb-2 text-secondary">{{ object.source_label }} | {{ object.schedule_label }}</p>
                 <p class="mb-2 text-secondary">{{ object.location }}</p>
-                <p class="mb-0 text-secondary">{{ object.description|truncatewords:30 }}</p>
+                <p class="mb-0 text-secondary">{{ object.description|plain_richtext|truncatewords:30 }}</p>
             </div>
 
             <form method="post">

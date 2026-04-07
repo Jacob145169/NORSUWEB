@@ -3,83 +3,80 @@
 {% block dashboard_content %}
 <section class="row justify-content-center">
     <div class="col-xl-9">
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                <div>
-                    <p class="section-eyebrow">News Management</p>
-                    <h1 class="section-title mb-2">{{ page_title }}</h1>
-                    <p class="mb-0 text-secondary">{{ page_description }}</p>
-                </div>
-                <a href="{% url 'accounts:news_list' %}" class="btn btn-outline-primary">Back to News List</a>
-            </div>
-
-            <form method="post" enctype="multipart/form-data" novalidate>
-                {% csrf_token %}
-                <div class="row g-4">
-                    <div class="col-12">
-                        <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
-                        {{ form.title }}
-                        {% if form.title.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.title.errors %}{{ error }}{% endfor %}
-                            </div>
-                        {% endif %}
+        <div class="mission-vision-card portal-form-card">
+            <div class="mission-vision-card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                    <div>
+                        <p class="section-eyebrow">News Management</p>
+                        <h1 class="section-title mb-2">{{ page_title }}</h1>
+                        <p class="mb-0 text-secondary">{{ page_description }}</p>
                     </div>
-                    {% if form.department.is_hidden %}
-                        {{ form.department }}
-                        <div class="col-md-4">
-                            <div class="dashboard-panel h-100">
-                                <div class="content-meta">Department</div>
-                                <div class="mt-2">{{ request.user.department.name }}</div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="col-md-6">
-                            <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
-                            {{ form.department }}
-                            {% if form.department.errors %}
+                    <a href="{% url 'accounts:update_list' %}" class="btn btn-outline-primary">Back to Updates</a>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {% for error in form.department.errors %}{{ error }}{% endfor %}
+                                    {% for error in form.title.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>
-                    {% endif %}
-                    <div class="col-12 news-editor-shell">
-                        <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
-                        {{ form.content }}
-                        <div class="form-text mt-2">
-                            Use the TinyMCE toolbar to format your post. The <strong>Preview</strong> button lets you review the final layout before publishing.
+                        {% if form.department.is_hidden %}
+                            {{ form.department }}
+                        {% else %}
+                            <div class="col-md-6">
+                                <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                                {{ form.department }}
+                                {% if form.department.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.department.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        <div class="col-12 news-editor-shell">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+                            {{ form.content }}
+                            <div class="form-text mt-2">
+                                Use the TinyMCE toolbar to format your post. The <strong>Preview</strong> button lets you review the final layout before publishing.
+                            </div>
+                            {% if form.content.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.content.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        {% if form.content.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.content.errors %}{{ error }}{% endfor %}
-                            </div>
-                        {% endif %}
+                        <div class="col-12">
+                            <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.image.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
-                        {{ form.image }}
-                        {% if form.image.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.image.errors %}{{ error }}{% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
 
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger mt-4" role="alert">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mt-4" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 
-                <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
-                    <button type="submit" class="btn btn-primary px-4">{{ submit_label }}</button>
-                    <a href="{% url 'accounts:news_list' %}" class="btn btn-outline-primary px-4">Cancel</a>
-                </div>
-            </form>
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <button type="submit" name="save_action" value="publish" class="btn btn-primary px-4">{{ submit_label }}</button>
+                        <button type="submit" name="save_action" value="draft" class="btn btn-outline-secondary px-4">{{ draft_label|default:"Save Draft" }}</button>
+                        <a href="{% url 'accounts:update_list' %}" class="btn btn-outline-primary px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </section>

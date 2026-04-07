@@ -1,74 +1,29 @@
 {% extends "accounts/dashboard_base.html" %}
+{% load static %}
 
 {% block dashboard_content %}
-<section class="row g-4 g-xl-5">
-    <div class="col-xl-3">
-        <div class="dashboard-sidebar sticky-xl-top">
-            <div class="info-card">
-                <p class="section-eyebrow">Super Admin</p>
-                <h1 class="section-title h3 mb-3">System control center</h1>
-                <p class="text-secondary mb-4">
-                    Full administrative access for university-wide content, records, and administrator accounts.
-                </p>
-                <nav class="dashboard-side-nav">
-                    <a href="#overview" class="dashboard-side-link">Overview</a>
-                    <a href="#management" class="dashboard-side-link">Management Areas</a>
-                    <a href="#quick-links" class="dashboard-side-link">Quick Links</a>
-                    <a href="#highlights" class="dashboard-side-link">System Highlights</a>
-                </nav>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-9">
+<section class="row g-4 g-xl-5 mt-3 mt-lg-4">
+    <div class="col-12">
         <section id="overview" class="mb-4 mb-xl-5">
-            <div class="info-card mb-4">
-                <p class="section-eyebrow">Overview</p>
-                <h2 class="section-title mb-3">University administration dashboard</h2>
-                <p class="mb-0 text-secondary">
-                    Monitor core records across the system and jump directly into the management areas that shape the public website and department data.
-                </p>
-                <div class="mt-4">
-                    <div class="d-flex flex-column flex-sm-row gap-2">
-                        <a href="{% url 'accounts:school_info_update' %}" class="btn btn-primary">Edit Landing Page Content</a>
-                        <a href="{% url 'accounts:department_list' %}" class="btn btn-outline-primary">Manage Departments</a>
-                        <a href="{% url 'accounts:department_admin_list' %}" class="btn btn-outline-primary">Manage Department Admins</a>
-                        <a href="{% url 'accounts:program_list' %}" class="btn btn-outline-primary">Manage Programs</a>
-                        <a href="{% url 'accounts:instructor_list' %}" class="btn btn-outline-primary">Manage Instructors</a>
-                        <a href="{% url 'accounts:announcement_list' %}" class="btn btn-outline-primary">Manage Announcements</a>
-                        <a href="{% url 'accounts:news_list' %}" class="btn btn-outline-primary">Manage News</a>
-                        <a href="{% url 'accounts:event_list' %}" class="btn btn-outline-primary">Manage Events</a>
-                        <a href="{% url 'accounts:alumni_list' %}" class="btn btn-outline-primary">Manage Alumni</a>
+            <div class="mission-vision-card mb-4">
+                <div class="mission-vision-card-body" style="min-height: auto;">
+                    <div class="mission-vision-card-top">
+                        <p class="section-eyebrow mb-0">Overview</p>
+                    </div>
+                    <div>
+                        <h2 class="section-title mb-3">University administration dashboard</h2>
+                        <p class="mb-0 text-secondary">
+                            Monitor core records across the system and jump directly into the management areas that shape the public website and department data.
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="row g-4">
+            <div id="statistics" class="row g-4">
                 {% for stat in overview_stats %}
                     <div class="col-sm-6 col-xxl-4">
                         <div class="dashboard-stat-card h-100">
                             <div class="dashboard-stat-value">{{ stat.value }}</div>
                             <div class="dashboard-stat-label">{{ stat.label }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section id="management" class="mb-4 mb-xl-5">
-            <div class="section-heading">
-                <p class="section-eyebrow">Management Access</p>
-                <h2 class="section-title mb-0">Administrative responsibility areas</h2>
-            </div>
-            <div class="row g-4 mt-1">
-                {% for section in management_sections %}
-                    <div class="col-lg-4">
-                        <div class="dashboard-panel h-100">
-                            <h3 class="h5 mb-3">{{ section.title }}</h3>
-                            <p class="text-secondary mb-3">{{ section.description }}</p>
-                            <ul class="dashboard-list mb-0">
-                                {% for item in section.items %}
-                                    <li>{{ item }}</li>
-                                {% endfor %}
-                            </ul>
                         </div>
                     </div>
                 {% endfor %}
@@ -88,50 +43,40 @@
                                 <h3 class="h5 mb-2">{{ link.title }}</h3>
                                 <p class="mb-0 text-secondary">{{ link.detail }}</p>
                             </div>
-                            <span class="dashboard-action-arrow">Open</span>
+                            <span class="dashboard-action-arrow">Manage</span>
                         </a>
                     </div>
                 {% endfor %}
             </div>
         </section>
 
-        <section id="highlights">
-            <div class="section-heading">
-                <p class="section-eyebrow">System Highlights</p>
-                <h2 class="section-title mb-0">Current setup snapshot</h2>
-            </div>
-            <div class="row g-4 mt-1">
-                <div class="col-md-4">
-                    <div class="dashboard-panel h-100">
-                        <div class="content-meta">Landing Page Content</div>
-                        <h3 class="h5 mt-2 mb-2">
-                            {% if system_highlights.landing_page_ready %}Configured{% else %}Not Yet Configured{% endif %}
-                        </h3>
-                        <p class="mb-0 text-secondary">
-                            {% if school_info and school_info.college_name %}
-                                Current title: {{ school_info.college_name }}
-                            {% else %}
-                                School information can be managed from the admin to power the public landing page sections.
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="dashboard-panel h-100">
-                        <div class="content-meta">Department Admins</div>
-                        <h3 class="h5 mt-2 mb-2">{{ system_highlights.department_admin_count }} account{{ system_highlights.department_admin_count|pluralize }}</h3>
-                        <p class="mb-0 text-secondary">Department administrator accounts can be assigned and maintained centrally by the super admin.</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="dashboard-panel h-100">
-                        <div class="content-meta">Active Departments</div>
-                        <h3 class="h5 mt-2 mb-2">{{ system_highlights.active_departments }} active unit{{ system_highlights.active_departments|pluralize }}</h3>
-                        <p class="mb-0 text-secondary">Active departments are available for public display and department-level content management.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
     </div>
 </section>
+{% endblock %}
+
+{% block dashboard_footer %}
+<footer class="site-footer dashboard-footer">
+    <div class="container py-2">
+        <div class="dashboard-footer-bar">
+            <div class="footer-brand">
+                <img
+                    src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
+                    alt="NORSU logo"
+                    class="site-brand-logo footer-brand-logo"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                >
+                <div class="site-brand-mark site-brand-mark-fallback footer-brand-mark">NORSU</div>
+                <div>
+                    <h2 class="h5 mb-2 text-white">Negros Oriental State University</h2>
+                    <p class="mb-0 footer-copy">
+                        Official university information website for institutional content, departmental updates, and academic public information.
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; {% now "Y" %} Negros Oriental State University</p>
+            </div>
+        </div>
+    </div>
+</footer>
 {% endblock %}

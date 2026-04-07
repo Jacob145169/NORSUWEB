@@ -229,6 +229,7 @@ class Command(BaseCommand):
                 department=department,
                 full_name=item["full_name"],
                 defaults={
+                    "id_number": item.get("id_number", ""),
                     "batch_year": item["batch_year"],
                     "course_program": item["course_program"],
                     "photo": None,

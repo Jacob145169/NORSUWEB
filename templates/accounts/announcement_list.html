@@ -1,4 +1,5 @@
 {% extends "accounts/dashboard_base.html" %}
+{% load content_richtext %}
 
 {% block dashboard_content %}
 <section class="row justify-content-center">
@@ -32,9 +33,9 @@
                             <tr>
                                 <td>
                                     <div class="fw-semibold">{{ announcement.title }}</div>
-                                    <div class="small text-secondary">{{ announcement.content|truncatewords:12 }}</div>
+                                    <div class="small text-secondary">{{ announcement.content|plain_richtext|truncatewords:12 }}</div>
                                 </td>
-                                <td>{{ announcement.department.name }}</td>
+                                <td>{{ announcement.source_label }}</td>
                                 <td>{{ announcement.posted_by.full_name|default:"Unknown" }}</td>
                                 <td>{{ announcement.date_posted|date:"M d, Y" }}</td>
                                 <td class="text-end">

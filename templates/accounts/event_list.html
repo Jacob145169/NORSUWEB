@@ -1,58 +1,66 @@
 {% extends "accounts/dashboard_base.html" %}
+{% load content_richtext %}
 
 {% block dashboard_content %}
 <section class="row justify-content-center">
     <div class="col-xl-11">
-        <div class="info-card">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                <div>
-                    <p class="section-eyebrow">Events</p>
-                    <h1 class="section-title mb-2">{{ page_title }}</h1>
-                    <p class="mb-0 text-secondary">{{ page_description }}</p>
+        <div class="mission-vision-card">
+            <div class="mission-vision-card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                    <div>
+                        <p class="section-eyebrow">Events</p>
+                        <h1 class="section-title mb-2">{{ page_title }}</h1>
+                        <p class="mb-0 text-secondary">{{ page_description }}</p>
+                    </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2">
+                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+                        <a href="{% url 'accounts:event_create' %}" class="btn btn-primary">Add Event</a>
+                    </div>
                 </div>
-                <div class="d-flex flex-column flex-sm-row gap-2">
-                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
-                    <a href="{% url 'accounts:event_create' %}" class="btn btn-primary">Add Event</a>
-                </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 program-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Event</th>
-                            <th scope="col">Department</th>
-                            <th scope="col">Event Date</th>
-                            <th scope="col">Location</th>
-                            <th scope="col" class="text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for event in events %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 program-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div class="fw-semibold">{{ event.title }}</div>
-                                    <div class="small text-secondary">{{ event.description|truncatewords:10 }}</div>
-                                </td>
-                                <td>{{ event.department.name }}</td>
-                                <td>{{ event.event_date|date:"M d, Y | h:i A" }}</td>
-                                <td>{{ event.location }}</td>
-                                <td class="text-end">
-                                    <div class="d-inline-flex flex-wrap justify-content-end gap-2">
-                                        <a href="{% url 'accounts:event_update' event.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                        <a href="{% url 'accounts:event_delete' event.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
-                                    </div>
-                                </td>
+                                <th scope="col">Event</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">Event Date</th>
+                                <th scope="col">Location</th>
+                                <th scope="col" class="text-end">Actions</th>
                             </tr>
-                        {% empty %}
-                            <tr>
-                                <td colspan="5">
-                                    <div class="empty-state my-3">No event records are available yet.</div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <div class="fw-semibold">{{ event.title }}</div>
+                                            {% if event.is_draft %}
+                                                <span class="badge rounded-pill text-bg-warning-subtle border">Draft</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="small text-secondary">{{ event.description|plain_richtext|truncatewords:10 }}</div>
+                                    </td>
+                                    <td>{{ event.source_label }}</td>
+                                    <td>{{ event.schedule_label }}</td>
+                                    <td>{{ event.location }}</td>
+                                    <td class="text-end">
+                                        <div class="d-inline-flex flex-wrap justify-content-end gap-2">
+                                            <a href="{% url 'accounts:event_update' event.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                                            <a href="{% url 'accounts:event_delete' event.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state my-3">No event records are available yet.</div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

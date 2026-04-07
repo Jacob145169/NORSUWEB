@@ -67,6 +67,23 @@ class User(AbstractUser):
         if self.role == RoleChoices.DEPARTMENT_ADMIN and self.department_id is None:
             raise ValidationError({"department": "Department admin must be assigned to a department."})
 
+        if self.role == RoleChoices.SUPER_ADMIN:
+            existing_super_admin = User.objects.filter(role=RoleChoices.SUPER_ADMIN)
+            if self.pk:
+                existing_super_admin = existing_super_admin.exclude(pk=self.pk)
+            if existing_super_admin.exists():
+                raise ValidationError({"role": "Only one super admin account is allowed."})
+
+        if self.role == RoleChoices.DEPARTMENT_ADMIN and self.department_id is not None:
+            existing_department_admin = User.objects.filter(
+                role=RoleChoices.DEPARTMENT_ADMIN,
+                department_id=self.department_id,
+            )
+            if self.pk:
+                existing_department_admin = existing_department_admin.exclude(pk=self.pk)
+            if existing_department_admin.exists():
+                raise ValidationError({"department": "This department already has an assigned department admin."})
+
     def save(self, *args, **kwargs):
         if self.role == RoleChoices.SUPER_ADMIN:
             self.department = None
@@ -74,6 +91,7 @@ class User(AbstractUser):
         elif self.role == RoleChoices.DEPARTMENT_ADMIN:
             self.is_staff = True
 
+        self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:

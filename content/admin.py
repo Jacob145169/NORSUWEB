@@ -21,8 +21,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("title", "department", "event_date", "location", "posted_by")
-    list_filter = ("department", "event_date")
+    list_display = ("title", "department", "event_date", "end_date", "location", "posted_by")
+    list_filter = ("department", "event_date", "end_date")
     search_fields = ("title", "description", "location")
     date_hierarchy = "event_date"
-

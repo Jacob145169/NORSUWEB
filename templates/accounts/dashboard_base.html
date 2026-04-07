@@ -11,7 +11,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
-    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260407r">
     {% if form %}{{ form.media.css }}{% endif %}
     {% block extra_css %}{% endblock %}
 </head>
@@ -21,15 +21,26 @@
         style="--portal-accent: {{ request.user.department.theme_color|default:'#12345b' }};"
     {% endif %}
 >
+    {% if request.user.role == "super_admin" %}
+        {% url 'accounts:super_admin_dashboard' as dashboard_home_url %}
+    {% else %}
+        {% url 'accounts:department_admin_dashboard' as dashboard_home_url %}
+    {% endif %}
     <nav class="navbar navbar-expand-lg site-navbar dashboard-navbar shadow-sm" data-bs-theme="dark">
         <div class="container">
-            <a class="navbar-brand site-brand" href="{% url 'accounts:dashboard' %}">
-                    <span class="site-brand-mark">NORSU</span>
-                    <span class="site-brand-copy">
-                        <span class="site-brand-title">Negros Oriental State University</span>
-                        <span class="site-brand-subtitle">Administrative Portal</span>
-                    </span>
-                </a>
+            <a class="navbar-brand site-brand" href="{{ dashboard_home_url }}">
+                <img
+                    src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
+                    alt="NORSU logo"
+                    class="site-brand-logo"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                >
+                <span class="site-brand-mark site-brand-mark-fallback">NORSU</span>
+                <span class="site-brand-copy">
+                    <span class="site-brand-title">Negros Oriental State University</span>
+                    <span class="site-brand-subtitle">Administrative Portal</span>
+                </span>
+            </a>
             <button
                 class="navbar-toggler"
                 type="button"
@@ -42,15 +53,60 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="dashboardNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                <ul class="navbar-nav ms-auto align-items-lg-center dashboard-top-nav">
+                    <li class="nav-item"><a class="nav-link" href="{{ dashboard_home_url }}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}">Public Site</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/">Django Admin</a></li>
-                    <li class="nav-item">
-                        <span class="nav-link disabled text-white-50">{{ request.user.full_name }}</span>
+                    {% if request.user.role == "super_admin" %}
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:school_info_update' %}" class="nav-link">Edit Homepage</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:department_list' %}" class="nav-link">Manage Departments</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:department_admin_list' %}" class="nav-link">Manage Department Admins</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:update_list' %}" class="nav-link">Manage Updates</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:event_list' %}" class="nav-link">Manage Events</a></li>
+                    {% else %}
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:program_list' %}" class="nav-link dashboard-section-link">Programs</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:instructor_list' %}" class="nav-link dashboard-section-link">Instructors</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:update_list' %}" class="nav-link dashboard-section-link">Updates</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:event_list' %}" class="nav-link dashboard-section-link">Events</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:alumni_list' %}" class="nav-link dashboard-section-link">Alumni</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:alumni_list' %}" class="nav-link">Manage Alumni</a></li>
+                    {% endif %}
+                    <li class="nav-item d-lg-none"><hr class="site-mobile-nav-divider"></li>
+                    <li class="nav-item d-lg-none">
+                        <a href="{% url 'accounts:logout' %}" class="nav-link site-mobile-nav-danger">Logout</a>
                     </li>
-                    <li class="nav-item ms-lg-2">
-                        <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-light site-nav-cta">Logout</a>
+                    <li class="nav-item dropdown d-none d-lg-block ms-lg-2">
+                        <button
+                            class="btn site-menu-button"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-label="Open account menu"
+                        >
+                            <span class="site-hamburger" aria-hidden="true">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end site-menu-dropdown">
+                            {% if request.user.role == "super_admin" %}
+                                <li><span class="dropdown-header site-menu-section">Manage</span></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:school_info_update' %}">Edit Homepage</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:department_list' %}">Manage Departments</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:department_admin_list' %}">Manage Department Admins</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:update_list' %}">Manage Updates</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:event_list' %}">Manage Events</a></li>
+                            {% else %}
+                                <li><span class="dropdown-header site-menu-section">Manage</span></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:program_list' %}">Programs</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:instructor_list' %}">Instructors</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:update_list' %}">Updates</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:event_list' %}">Events</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:alumni_list' %}">Alumni</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider site-menu-divider"></li>
+                            <li><a class="dropdown-item site-menu-danger" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -59,21 +115,6 @@
 
     <main class="py-5">
         <div class="container">
-            <section class="portal-page-header mb-4 mb-lg-5">
-                <div class="portal-page-header-inner">
-                    <div>
-                        <p class="section-eyebrow mb-2">Administrative Portal</p>
-                        <h1 class="portal-page-title mb-2">{{ dashboard_title }}</h1>
-                        <p class="portal-page-copy mb-0">
-                            Manage university records, public-facing content, and department-level information through a shared administrative workspace.
-                        </p>
-                    </div>
-                    <div class="portal-meta-chip">
-                        <span class="portal-meta-label">Signed in as</span>
-                        <strong>{{ request.user.full_name|default:request.user.username }}</strong>
-                    </div>
-                </div>
-            </section>
             {% if messages %}
                 <div class="mb-4">
                     {% for message in messages %}
@@ -86,6 +127,7 @@
             {% block dashboard_content %}{% endblock %}
         </div>
     </main>
+    {% block dashboard_footer %}{% endblock %}
 
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

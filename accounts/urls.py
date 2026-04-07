@@ -4,6 +4,7 @@ from .views import (
     AdminLoginView,
     AlumniCreateView,
     AlumniDeleteView,
+    AlumniExportPdfView,
     AlumniListView,
     AlumniUpdateView,
     AnnouncementCreateView,
@@ -32,12 +33,15 @@ from .views import (
     DepartmentAdminListView,
     DepartmentAdminToggleStatusView,
     DepartmentAdminUpdateView,
+    DepartmentLeadershipUpdateView,
     DepartmentUpdateView,
     InstructorUpdateView,
     NewsUpdateView,
     ProgramUpdateView,
     SchoolInfoUpdateView,
     SuperAdminDashboardView,
+    UpdateCreateView,
+    UpdatesListView,
     admin_logout,
 )
 
@@ -50,6 +54,7 @@ urlpatterns = [
     path("dashboard/", DashboardRedirectView.as_view(), name="dashboard"),
     path("dashboard/super-admin/", SuperAdminDashboardView.as_view(), name="super_admin_dashboard"),
     path("dashboard/department/", DepartmentAdminDashboardView.as_view(), name="department_admin_dashboard"),
+    path("dashboard/department/leadership/", DepartmentLeadershipUpdateView.as_view(), name="department_leadership_update"),
 
     # Super admin management
     path("dashboard/super-admin/school-info/", SchoolInfoUpdateView.as_view(), name="school_info_update"),
@@ -67,6 +72,8 @@ urlpatterns = [
     path("programs/add/", ProgramCreateView.as_view(), name="program_create"),
     path("programs/<int:pk>/edit/", ProgramUpdateView.as_view(), name="program_update"),
     path("programs/<int:pk>/delete/", ProgramDeleteView.as_view(), name="program_delete"),
+    path("updates/", UpdatesListView.as_view(), name="update_list"),
+    path("updates/add/", UpdateCreateView.as_view(), name="update_create"),
     path("announcements/", AnnouncementListView.as_view(), name="announcement_list"),
     path("announcements/add/", AnnouncementCreateView.as_view(), name="announcement_create"),
     path("announcements/<int:pk>/edit/", AnnouncementUpdateView.as_view(), name="announcement_update"),
@@ -80,6 +87,7 @@ urlpatterns = [
     path("events/<int:pk>/edit/", EventUpdateView.as_view(), name="event_update"),
     path("events/<int:pk>/delete/", EventDeleteView.as_view(), name="event_delete"),
     path("alumni/", AlumniListView.as_view(), name="alumni_list"),
+    path("alumni/export/pdf/", AlumniExportPdfView.as_view(), name="alumni_export_pdf"),
     path("alumni/add/", AlumniCreateView.as_view(), name="alumni_create"),
     path("alumni/<int:pk>/edit/", AlumniUpdateView.as_view(), name="alumni_update"),
     path("alumni/<int:pk>/delete/", AlumniDeleteView.as_view(), name="alumni_delete"),
