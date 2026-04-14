@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}NORSU Calendar 2025-2026 | Negros Oriental State University{% endblock %}
+
+{% block extra_css %}
+<style>
+.calendar-gallery {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.calendar-gallery-card {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.calendar-gallery-image {
+    max-height: none;
+    width: 100%;
+    object-fit: contain;
+    background: #fff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner text-center">
+            <div class="w-100">
+                <span class="section-eyebrow">Calendar</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-0">NORSU Calendar 2025-2026</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        {% if calendar_images %}
+            <div class="row g-4 calendar-gallery">
+                {% for calendar_image in calendar_images %}
+                    <div class="col-12">
+                        <article class="mission-vision-card update-detail-card calendar-gallery-card">
+                            <div class="update-detail-card-body">
+                                <img
+                                    src="{{ calendar_image.image.url }}"
+                                    alt="NORSU Calendar picture {{ forloop.counter }}"
+                                    class="img-fluid rounded-4 border w-100 calendar-gallery-image"
+                                >
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <article class="mission-vision-card update-detail-card">
+                <div class="update-detail-card-body">
+                    <div
+                        class="d-flex align-items-center justify-content-center rounded-4 border bg-white text-secondary fw-semibold"
+                        style="min-height: 24rem;"
+                    >
+                        Picture
+                    </div>
+                </div>
+            </article>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni | Negros Oriental State University{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">Alumni</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">Public alumni profiles</h1>
+                <p class="portal-page-copy mb-0">
+                    Meet NORSU graduates and explore alumni profiles shared publicly across departments.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        <form method="get" class="row g-3 align-items-end mb-4">
+            <div class="col-md-5 col-lg-4">
+                <label for="alumni-department-filter" class="form-label">Filter by Department</label>
+                <select
+                    id="alumni-department-filter"
+                    name="department"
+                    class="form-select"
+                    onchange="this.form.submit()"
+                >
+                    <option value="">All Departments</option>
+                    {% for department in department_options %}
+                        <option value="{{ department.pk }}" {% if selected_department == department.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ department.name }} ({{ department.public_alumni_count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5 col-lg-4">
+                <label for="alumni-batch-filter" class="form-label">Filter by Batch</label>
+                <select
+                    id="alumni-batch-filter"
+                    name="batch"
+                    class="form-select"
+                    {% if not selected_department_name %}disabled{% endif %}
+                    onchange="this.form.submit()"
+                >
+                    <option value="">All Batches</option>
+                    {% for batch_year in batch_options %}
+                        <option value="{{ batch_year }}" {% if selected_batch == batch_year|stringformat:"s" %}selected{% endif %}>
+                            Batch {{ batch_year }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
+        {% if selected_department_name %}
+            <div class="mb-4">
+                <p class="small text-secondary mb-0">
+                    Showing alumni from <strong>{{ selected_department_name }}</strong>.
+                </p>
+            </div>
+        {% endif %}
+
+        <div class="row g-4">
+            {% for alumnus in public_alumni %}
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <article class="card alumni-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="person-photo-wrap mb-3">
+                                {% if alumnus.photo %}
+                                    <img src="{{ alumnus.photo.url }}" alt="{{ alumnus.full_name }}" class="person-photo">
+                                {% else %}
+                                    <div class="person-photo-placeholder">{{ alumnus.full_name|slice:":1" }}</div>
+                                {% endif %}
+                            </div>
+                            <h2 class="h6 mb-1">{{ alumnus.full_name }}</h2>
+                            <p class="small text-secondary mb-1">{{ alumnus.department.name }}</p>
+                            <p class="small text-secondary mb-0">Batch {{ alumnus.batch_year }} | {{ alumnus.course_program }}</p>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        {% if selected_department_name %}
+                            No public alumni profiles are available for {{ selected_department_name }}.
+                        {% else %}
+                            Select a department to view alumni profiles.
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

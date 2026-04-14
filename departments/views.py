@@ -2,7 +2,7 @@ from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, render
 
 from accounts.models import RoleChoices, User
-from academics.models import Instructor, Program
+from academics.models import Instructor, Program, ProgramUniformImage
 from alumni.models import Alumni
 from content.models import Announcement, Event, News, PublicationStatus
 from .models import Department, SchoolInfo
@@ -24,7 +24,16 @@ def department_detail(request, slug):
                 queryset=User.objects.filter(role=RoleChoices.DEPARTMENT_ADMIN, is_active=True).order_by("full_name"),
                 to_attr="department_admin_accounts",
             ),
-            Prefetch("programs", queryset=Program.objects.order_by("program_name")),
+            Prefetch(
+                "programs",
+                queryset=Program.objects.order_by("program_name").prefetch_related(
+                    Prefetch(
+                        "uniform_images",
+                        queryset=ProgramUniformImage.objects.order_by("sort_order", "created_at", "pk"),
+                        to_attr="prefetched_uniform_images",
+                    )
+                ),
+            ),
             Prefetch("instructors", queryset=Instructor.objects.order_by("full_name")),
             Prefetch(
                 "announcements",

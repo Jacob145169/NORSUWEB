@@ -1,7 +1,7 @@
 from django.test import SimpleTestCase, TestCase
 from django.utils import timezone
 
-from accounts.forms import AnnouncementForm, EventForm, NewsForm
+from accounts.forms import AnnouncementForm, EventForm, NewsForm, UpdateCreateForm
 from departments.models import Department
 
 from .models import Announcement, Event, News
@@ -150,6 +150,8 @@ class NewsRichTextUtilityTests(SimpleTestCase):
 
         self.assertEqual(form.fields["content"].widget.attrs["data-richtext-editor"], "tinymce")
         self.assertIn("/static/vendor/tinymce/tinymce.min.js", rendered_media)
+        self.assertIn("video", form.fields)
+        self.assertFalse(form.fields["video"].required)
 
     def test_event_form_uses_tinymce_media(self):
         form = EventForm()
@@ -157,9 +159,23 @@ class NewsRichTextUtilityTests(SimpleTestCase):
 
         self.assertEqual(form.fields["description"].widget.attrs["data-richtext-editor"], "tinymce")
         self.assertIn("/static/vendor/tinymce/tinymce.min.js", rendered_media)
+        self.assertIn("video", form.fields)
+        self.assertFalse(form.fields["video"].required)
 
     def test_event_form_exposes_optional_end_date_field(self):
         form = EventForm()
 
         self.assertIn("end_date", form.fields)
         self.assertFalse(form.fields["end_date"].required)
+
+    def test_news_form_exposes_optional_video_field(self):
+        form = NewsForm()
+
+        self.assertIn("video", form.fields)
+        self.assertFalse(form.fields["video"].required)
+
+    def test_shared_update_create_form_exposes_optional_video_field(self):
+        form = UpdateCreateForm()
+
+        self.assertIn("video", form.fields)
+        self.assertFalse(form.fields["video"].required)

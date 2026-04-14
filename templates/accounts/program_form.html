@@ -1,7 +1,7 @@
 {% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<section class="row justify-content-center">
+<section class="row justify-content-center dashboard-centered-page">
     <div class="col-xl-9">
         <div class="mission-vision-card portal-form-card">
             <div class="mission-vision-card-body">
@@ -14,7 +14,7 @@
                     <a href="{% url 'accounts:program_list' %}" class="btn btn-outline-primary">Back to Program List</a>
                 </div>
 
-                <form method="post" novalidate>
+                <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
                     <div class="row g-4">
                         <div class="col-md-4">
@@ -57,6 +57,90 @@
                                 </div>
                             {% endif %}
                         </div>
+                        {% if form.course_uniform_description %}
+                            <div class="col-12">
+                                <label for="{{ form.course_uniform_description.id_for_label }}" class="form-label">Course Uniform Details</label>
+                                {{ form.course_uniform_description }}
+                                {% if form.course_uniform_description.help_text %}
+                                    <div class="form-text">{{ form.course_uniform_description.help_text }}</div>
+                                {% endif %}
+                                {% if form.course_uniform_description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.course_uniform_description.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if form.course_uniform_images %}
+                            <div class="col-12">
+                                <label for="{{ form.course_uniform_images.id_for_label }}" class="form-label">Course Uniform Pictures</label>
+                                {{ form.course_uniform_images }}
+                                {% if form.course_uniform_images.help_text %}
+                                    <div class="form-text">{{ form.course_uniform_images.help_text }}</div>
+                                {% endif %}
+                                {% if form.course_uniform_images.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.course_uniform_images.errors %}{{ error }}{% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if form.course_uniform_images %}
+                            {% if form.current_course_uniform_images or form.legacy_course_uniform_image %}
+                                <div class="col-12">
+                                    <p class="small text-secondary mb-2">Current course uniform pictures</p>
+                                    <div class="row g-3">
+                                        {% with selected_remove_ids=form.remove_course_uniform_images.value %}
+                                            {% for uniform_image in form.current_course_uniform_images %}
+                                                <div class="col-md-6">
+                                                    <div class="border rounded-4 p-3 h-100 d-flex flex-column uniform-picture-card">
+                                                        <div class="uniform-picture-preview-frame">
+                                                            <img
+                                                                src="{{ uniform_image.image.url }}"
+                                                                alt="Current program course uniform {{ forloop.counter }}"
+                                                                class="img-fluid rounded-4 border uniform-picture-preview"
+                                                            >
+                                                        </div>
+                                                        <label class="uniform-picture-remove-toggle mt-3 mb-0">
+                                                            <input
+                                                                class="form-check-input"
+                                                                type="checkbox"
+                                                                name="remove_course_uniform_images"
+                                                                value="{{ uniform_image.pk }}"
+                                                                {% if selected_remove_ids and uniform_image.pk|stringformat:"s" in selected_remove_ids %}checked{% endif %}
+                                                            >
+                                                            <span>Remove this picture</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endwith %}
+                                        {% if form.legacy_course_uniform_image %}
+                                            <div class="col-md-6">
+                                                <div class="border rounded-4 p-3 h-100 d-flex flex-column uniform-picture-card">
+                                                    <div class="uniform-picture-preview-frame">
+                                                        <img
+                                                            src="{{ form.legacy_course_uniform_image.url }}"
+                                                            alt="Current program course uniform"
+                                                            class="img-fluid rounded-4 border uniform-picture-preview"
+                                                        >
+                                                    </div>
+                                                    <p class="small text-secondary mt-3 mb-0 text-center uniform-picture-note">This existing picture will be moved into the gallery when you save.</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if form.remove_course_uniform_images.errors %}
+                                        <div class="invalid-feedback d-block mt-2">
+                                            {% for error in form.remove_course_uniform_images.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.remove_course_uniform_images.help_text and form.current_course_uniform_images %}
+                                        <div class="form-text mt-2">{{ form.remove_course_uniform_images.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
                     </div>
 
                     {% if form.non_field_errors %}

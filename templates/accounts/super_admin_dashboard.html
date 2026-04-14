@@ -2,55 +2,67 @@
 {% load static %}
 
 {% block dashboard_content %}
-<section class="row g-4 g-xl-5 mt-3 mt-lg-4">
-    <div class="col-12">
-        <section id="overview" class="mb-4 mb-xl-5">
-            <div class="mission-vision-card mb-4">
-                <div class="mission-vision-card-body" style="min-height: auto;">
-                    <div class="mission-vision-card-top">
-                        <p class="section-eyebrow mb-0">Overview</p>
-                    </div>
-                    <div>
-                        <h2 class="section-title mb-3">University administration dashboard</h2>
-                        <p class="mb-0 text-secondary">
-                            Monitor core records across the system and jump directly into the management areas that shape the public website and department data.
-                        </p>
-                    </div>
+<section class="super-admin-shell mt-4 mt-lg-5">
+    <header class="super-admin-hero">
+        <div class="super-admin-hero-grid">
+            <div class="super-admin-hero-main">
+                <span class="super-admin-pill">Super Admin Overview</span>
+                <div class="super-admin-hero-copy">
+                    <h1 class="super-admin-title">University administration dashboard</h1>
+                    <p class="super-admin-lead mb-0">
+                        Monitor academic records, manage website content, and take action on pending items across the system from one place.
+                    </p>
                 </div>
             </div>
-            <div id="statistics" class="row g-4">
-                {% for stat in overview_stats %}
-                    <div class="col-sm-6 col-xxl-4">
-                        <div class="dashboard-stat-card h-100">
-                            <div class="dashboard-stat-value">{{ stat.value }}</div>
-                            <div class="dashboard-stat-label">{{ stat.label }}</div>
+        </div>
+    </header>
+
+    <section class="super-admin-stats-grid">
+        {% for stat in dashboard_stats %}
+            <a href="{{ stat.url }}" class="super-admin-stat-card super-admin-stat-card--{{ stat.theme }} text-decoration-none">
+                <div class="super-admin-stat-accent">
+                    <span class="super-admin-stat-icon" aria-hidden="true">
+                        {% include "includes/dashboard_icon.html" with icon=stat.icon %}
+                    </span>
+                    <span class="super-admin-stat-badge">{{ stat.badge }}</span>
+                </div>
+                <div class="super-admin-stat-body">
+                    <p class="super-admin-stat-title">{{ stat.title }}</p>
+                    <div class="super-admin-stat-value-row">
+                        <h2 class="super-admin-stat-value mb-0" data-count-to="{{ stat.value }}">{{ stat.value }}</h2>
+                        <span class="super-admin-stat-link">View details</span>
+                    </div>
+                    <p class="super-admin-stat-note mb-0">{{ stat.note }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </section>
+
+    <section class="super-admin-panels-grid">
+        <div class="super-admin-panel super-admin-panel--activity">
+            <div class="super-admin-panel-header">
+                <div>
+                    <h2 class="super-admin-panel-title">Recent activity</h2>
+                    <p class="super-admin-panel-copy mb-0">Latest actions across the admin panel</p>
+                </div>
+                <a href="{% url 'accounts:update_list' %}" class="super-admin-panel-link">See all</a>
+            </div>
+            <div class="super-admin-activity-list">
+                {% for item in recent_activity %}
+                    <a href="{{ item.url }}" class="super-admin-activity-item text-decoration-none">
+                        <span class="super-admin-activity-index">{{ forloop.counter|stringformat:"02d" }}</span>
+                        <div class="super-admin-activity-body">
+                            <p class="super-admin-activity-title">{{ item.title }}</p>
+                            <p class="super-admin-activity-meta">{{ item.category }} | {{ item.meta }} | {{ item.time_ago }}</p>
+                            <p class="super-admin-activity-copy mb-0">{{ item.detail }}</p>
                         </div>
-                    </div>
+                    </a>
+                {% empty %}
+                    <div class="empty-state">Recent activity will appear here once records and content are added.</div>
                 {% endfor %}
             </div>
-        </section>
-
-        <section id="quick-links" class="mb-4 mb-xl-5">
-            <div class="section-heading">
-                <p class="section-eyebrow">Quick Links</p>
-                <h2 class="section-title mb-0">Direct management actions</h2>
-            </div>
-            <div class="row g-4 mt-1">
-                {% for link in quick_links %}
-                    <div class="col-md-6">
-                        <a href="{{ link.url }}" class="dashboard-action-card text-decoration-none h-100">
-                            <div>
-                                <h3 class="h5 mb-2">{{ link.title }}</h3>
-                                <p class="mb-0 text-secondary">{{ link.detail }}</p>
-                            </div>
-                            <span class="dashboard-action-arrow">Manage</span>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
-
-    </div>
+        </div>
+    </section>
 </section>
 {% endblock %}
 
@@ -79,4 +91,37 @@
         </div>
     </div>
 </footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const counterElements = document.querySelectorAll("[data-count-to]");
+
+    counterElements.forEach(function (counter) {
+        const target = Number(counter.dataset.countTo || "0");
+        if (!Number.isFinite(target)) {
+            return;
+        }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            counter.textContent = target;
+            return;
+        }
+
+        const duration = 900;
+        const start = performance.now();
+
+        function tick(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            counter.textContent = Math.round(target * progress);
+            if (progress < 1) {
+                window.requestAnimationFrame(tick);
+            }
+        }
+
+        counter.textContent = "0";
+        window.requestAnimationFrame(tick);
+    });
+});
+</script>
 {% endblock %}

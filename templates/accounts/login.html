@@ -11,7 +11,28 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
-    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <script>
+    (function () {
+        const storageKey = "norsu-site-theme";
+        let resolvedTheme = "day";
+
+        try {
+            const savedTheme = window.localStorage.getItem(storageKey);
+            if (savedTheme === "night" || savedTheme === "day") {
+                resolvedTheme = savedTheme;
+            } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        } catch (error) {
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        }
+
+        document.documentElement.setAttribute("data-site-theme", resolvedTheme);
+    }());
+    </script>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260413m">
 </head>
 <body class="admin-auth-body">
     <main class="min-vh-100 d-flex align-items-center py-5">
@@ -19,7 +40,27 @@
             <div class="row justify-content-center">
                 <div class="col-md-10 col-lg-6 col-xl-5">
                     <div class="admin-auth-card p-4 p-md-5">
-                        <p class="section-eyebrow mb-3">Admin Portal</p>
+                        <div class="admin-auth-card-top mb-3">
+                            <p class="section-eyebrow mb-0">Admin Portal</p>
+                            <button
+                                class="btn admin-auth-theme-toggle"
+                                type="button"
+                                data-site-theme-toggle
+                                aria-label="Switch to night mode"
+                                aria-pressed="false"
+                                title="Switch to night mode"
+                            >
+                                <span class="site-theme-toggle-icons" aria-hidden="true">
+                                    <svg class="site-theme-toggle-icon site-theme-toggle-icon--moon" viewBox="0 0 24 24" fill="none" role="presentation">
+                                        <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    <svg class="site-theme-toggle-icon site-theme-toggle-icon--sun" viewBox="0 0 24 24" fill="none" role="presentation">
+                                        <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"></circle>
+                                        <path d="M12 2.75v2.1M12 19.15v2.1M21.25 12h-2.1M4.85 12h-2.1M18.54 5.46l-1.48 1.48M6.94 17.06l-1.48 1.48M18.54 18.54l-1.48-1.48M6.94 6.94L5.46 5.46" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                                    </svg>
+                                </span>
+                            </button>
+                        </div>
                         <h1 class="h2 fw-bold mb-3">Negros Oriental State University</h1>
                         <p class="text-secondary mb-4">
                             Sign in with your administrator account to manage university and department content.
@@ -61,6 +102,50 @@
             </div>
         </div>
     </main>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeToggles = Array.from(document.querySelectorAll("[data-site-theme-toggle]"));
+        const root = document.documentElement;
+        const storageKey = "norsu-site-theme";
+
+        function getTheme() {
+            return root.getAttribute("data-site-theme") === "night" ? "night" : "day";
+        }
+
+        function applyTheme(theme) {
+            const nextTheme = theme === "night" ? "night" : "day";
+            const switchLabel = nextTheme === "night" ? "day mode" : "night mode";
+
+            root.setAttribute("data-site-theme", nextTheme);
+
+            themeToggles.forEach((themeToggle) => {
+                const themeLabel = themeToggle.querySelector("[data-theme-toggle-label]");
+
+                themeToggle.setAttribute("aria-pressed", String(nextTheme === "night"));
+                themeToggle.setAttribute("aria-label", "Switch to " + switchLabel);
+                themeToggle.setAttribute("title", "Switch to " + switchLabel);
+
+                if (themeLabel) {
+                    themeLabel.textContent = nextTheme === "night" ? "Day mode" : "Night mode";
+                }
+            });
+        }
+
+        applyTheme(getTheme());
+
+        themeToggles.forEach((themeToggle) => {
+            themeToggle.addEventListener("click", function () {
+                const nextTheme = getTheme() === "night" ? "day" : "night";
+                applyTheme(nextTheme);
+
+                try {
+                    window.localStorage.setItem(storageKey, nextTheme);
+                } catch (error) {
+                    return;
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
-

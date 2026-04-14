@@ -1,11 +1,15 @@
-from django.db import models
 import re
+from types import SimpleNamespace
+
+from django.db import models
 
 
 class Program(models.Model):
     program_code = models.CharField(max_length=30)
     program_name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    course_uniform_description = models.TextField(blank=True, default="")
+    course_uniform_image = models.ImageField(upload_to="programs/uniforms/", blank=True, null=True)
     department = models.ForeignKey(
         "departments.Department",
         on_delete=models.CASCADE,
@@ -41,6 +45,41 @@ class Program(models.Model):
             return name
 
         return name
+
+    @property
+    def uniform_images_for_display(self):
+        prefetched_uniform_images = getattr(self, "prefetched_uniform_images", None)
+        uniform_images = list(prefetched_uniform_images if prefetched_uniform_images is not None else self.uniform_images.all())
+        if uniform_images:
+            return uniform_images
+        if self.course_uniform_image:
+            return [
+                SimpleNamespace(
+                    pk=f"legacy-{self.pk}",
+                    image=self.course_uniform_image,
+                    is_legacy=True,
+                )
+            ]
+        return []
+
+
+class ProgramUniformImage(models.Model):
+    program = models.ForeignKey(
+        Program,
+        on_delete=models.CASCADE,
+        related_name="uniform_images",
+    )
+    image = models.ImageField(upload_to="programs/uniforms/")
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sort_order", "created_at", "pk"]
+        verbose_name = "Program Uniform Image"
+        verbose_name_plural = "Program Uniform Images"
+
+    def __str__(self) -> str:
+        return f"{self.program.program_code} Uniform {self.pk}"
 
 
 class Instructor(models.Model):

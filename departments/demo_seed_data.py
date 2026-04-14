@@ -33,6 +33,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Arts and Sciences",
         "description": "Offers foundational and emerging disciplines in the sciences, humanities, and computing.",
         "theme_color": "#0f6b4f",
+        "theme_color_secondary": "#2563eb",
         "admin": {
             "username": "cas_admin",
             "email": "cas.admin.demo@norsu.edu.ph",
@@ -121,6 +122,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Teacher Education",
         "description": "Develops future educators equipped for classroom leadership, pedagogy, and community-responsive teaching.",
         "theme_color": "#1f6f8b",
+        "theme_color_secondary": "#f59e0b",
         "admin": {
             "username": "cted_admin",
             "email": "cted.admin.demo@norsu.edu.ph",
@@ -219,6 +221,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Criminal Justice Education",
         "description": "Provides academic and professional preparation for criminology, public safety, and justice-oriented service.",
         "theme_color": "#6b1f2a",
+        "theme_color_secondary": "#d97706",
         "admin": {
             "username": "ccje_admin",
             "email": "ccje.admin.demo@norsu.edu.ph",
@@ -302,6 +305,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Business Administration",
         "description": "Focuses on business, accountancy, office administration, and service-oriented management education.",
         "theme_color": "#9a6b12",
+        "theme_color_secondary": "#facc15",
         "admin": {
             "username": "cba_admin",
             "email": "cba.admin.demo@norsu.edu.ph",
@@ -395,6 +399,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Industrial Technology",
         "description": "Offers applied technology programs that support technical competence, industry readiness, and innovation.",
         "theme_color": "#4b5563",
+        "theme_color_secondary": "#0ea5e9",
         "admin": {
             "username": "cit_admin",
             "email": "cit.admin.demo@norsu.edu.ph",
@@ -493,6 +498,7 @@ DEMO_DEPARTMENTS = [
         "name": "College of Agriculture and Forestry",
         "description": "Promotes sustainable agriculture, resource management, and science-based environmental stewardship.",
         "theme_color": "#3f7d20",
+        "theme_color_secondary": "#84cc16",
         "admin": {
             "username": "caf_admin",
             "email": "caf.admin.demo@norsu.edu.ph",

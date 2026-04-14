@@ -1,9 +1,13 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import formats, timezone
 
 from .richtext import sanitize_richtext
+
+
+ALLOWED_VIDEO_EXTENSIONS = ["mp4", "webm", "ogg", "mov", "m4v"]
 
 
 class PublicationStatus(models.TextChoices):
@@ -33,6 +37,12 @@ class DepartmentContentBase(models.Model):
         db_index=True,
     )
     image = models.ImageField(upload_to="content/images/", blank=True, null=True)
+    video = models.FileField(
+        upload_to="content/videos/",
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=ALLOWED_VIDEO_EXTENSIONS)],
+    )
 
     class Meta:
         abstract = True

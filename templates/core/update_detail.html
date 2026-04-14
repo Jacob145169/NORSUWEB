@@ -25,9 +25,22 @@
     <div class="container">
         <article class="mission-vision-card update-detail-card">
             <div class="update-detail-card-body">
-                {% if update_item.image %}
+                {% if update_item.video or update_item.image %}
                     <div class="update-detail-hero mb-4">
-                        <img src="{{ update_item.image.url }}" class="update-detail-image" alt="{{ update_item.title }}">
+                        {% if update_item.video %}
+                            <video
+                                class="update-detail-video"
+                                controls
+                                playsinline
+                                preload="metadata"
+                                {% if update_item.image %}poster="{{ update_item.image.url }}"{% endif %}
+                            >
+                                <source src="{{ update_item.video.url }}">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% else %}
+                            <img src="{{ update_item.image.url }}" class="update-detail-image" alt="{{ update_item.title }}">
+                        {% endif %}
                     </div>
                 {% endif %}
                 <div class="update-detail-meta-row">

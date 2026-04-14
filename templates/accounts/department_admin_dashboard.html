@@ -2,7 +2,7 @@
 {% load content_richtext %}
 
 {% block dashboard_content %}
-<section class="row g-3 g-xl-5 department-dashboard mt-3 mt-lg-4" style="--department-theme: {{ department.theme_color|default:'#12345b' }};">
+<section class="row g-3 g-xl-5 department-dashboard mt-3 mt-lg-4" style="--department-theme: {{ department.theme_color|default:'#12345b' }}; --department-theme-secondary: {{ department.theme_gradient_end|default:'#12345b' }};">
     <div class="col-12 department-sidebar-column mb-3 mb-xl-4">
         <div class="dashboard-sidebar">
             <div class="info-card department-dashboard-sidebar">
@@ -11,7 +11,7 @@
                         {% if department.logo %}
                             <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
                         {% else %}
-                            <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                            <div class="department-logo-placeholder" style="background: linear-gradient(135deg, {{ department.theme_color }}, {{ department.theme_gradient_end }});">
                                 {{ department.code }}
                             </div>
                         {% endif %}

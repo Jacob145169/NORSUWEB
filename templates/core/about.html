@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}About | Negros Oriental State University{% endblock %}
+
+{% block extra_css %}
+<style>
+.about-section-anchor {
+    scroll-margin-top: 8rem;
+}
+
+.calendar-gallery {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.calendar-gallery-card {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.calendar-gallery-image {
+    max-height: none;
+    width: 100%;
+    object-fit: contain;
+    background: #fff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner">
+            <div>
+                <span class="section-eyebrow">About</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">{{ page_heading }}</h1>
+                <p class="portal-page-copy mb-0">{{ page_description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="history">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="history-card">
+                    <div class="history-card-layout{% if history_image_url %} history-card-layout--with-media{% endif %}">
+                        <div class="history-card-copy">
+                            <p class="section-eyebrow">History</p>
+                            {% if history_image_url %}
+                                <figure class="history-card-media" aria-label="Campus photo">
+                                    <img
+                                        src="{{ history_image_url }}"
+                                        alt="Negros Oriental State University Bayawan-Sta. Catalina Campus"
+                                        class="history-card-image"
+                                    >
+                                    <figcaption class="history-card-caption">
+                                        NORSU Bayawan-Sta. Catalina Campus
+                                    </figcaption>
+                                </figure>
+                            {% endif %}
+                            <div class="history-card-content history-card-content--timeline mb-0">
+                                {% if history_content %}
+                                    {{ history_content|linebreaks }}
+                                {% else %}
+                                    {{ history_fallback|linebreaks }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="mission-vision">
+    <div class="container">
+        <div class="portal-page-header-inner mb-4">
+            <div>
+                <span class="section-eyebrow">Mission &amp; Vision</span>
+                <h2 class="display-6 fw-bold portal-page-title mt-3 mb-0">Mission and vision</h2>
+            </div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-6">
+                <div class="mission-vision-card h-100">
+                    <div class="mission-vision-card-body">
+                        <div class="mission-vision-card-top">
+                            <p class="section-eyebrow mb-0">Mission</p>
+                        </div>
+                        <div class="mission-vision-copy">
+                            {% if mission_content %}
+                                {{ mission_content|linebreaks }}
+                            {% else %}
+                                {{ mission_fallback|linebreaks }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="mission-vision-card h-100">
+                    <div class="mission-vision-card-body">
+                        <div class="mission-vision-card-top">
+                            <p class="section-eyebrow mb-0">Vision</p>
+                        </div>
+                        <div class="mission-vision-copy">
+                            {% if vision_content %}
+                                {{ vision_content|linebreaks }}
+                            {% else %}
+                                {{ vision_fallback|linebreaks }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="strategic-goals">
+    <div class="container">
+        <div class="portal-page-header-inner mb-4">
+            <div>
+                <span class="section-eyebrow">Strategic Goals</span>
+                <h2 class="display-6 fw-bold portal-page-title mt-3 mb-0">University strategic goals</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="mission-vision-card strategic-goal-shell">
+                    {% if strategic_goal_cards %}
+                        <div class="mission-vision-card-body core-values-page-card-body">
+                            <div class="mission-vision-card-top justify-content-center">
+                                <p class="section-eyebrow mb-0">Strategic Goals</p>
+                            </div>
+                            <div class="mission-vision-copy strategic-goal-page-intro">
+                                <p>Negros Oriental State University will:</p>
+                            </div>
+                            <div class="row g-4 justify-content-center home-core-values-grid core-values-page-grid strategic-goal-page-grid">
+                                {% for card in strategic_goal_cards %}
+                                    <div class="col-12 d-flex strategic-goal-page-column">
+                                        <article class="shine-value-card core-values-page-value strategic-goal-page-value h-100 w-100">
+                                            <span class="shine-value-letter strategic-goal-page-number">{{ card.badge }}</span>
+                                            <h3 class="shine-value-title strategic-goal-page-title mb-0">{{ card.text }}</h3>
+                                        </article>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="mission-vision-card-body">
+                            <div class="mission-vision-card-top">
+                                <p class="section-eyebrow mb-0">Strategic Goals</p>
+                            </div>
+                            <div class="mission-vision-copy">
+                                {% if strategic_goals_content %}
+                                    {{ strategic_goals_content|linebreaks }}
+                                {% else %}
+                                    {{ strategic_goals_fallback|linebreaks }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="core-values">
+    <div class="container">
+        <div class="portal-page-header-inner mb-4">
+            <div>
+                <span class="section-eyebrow">Core Values</span>
+                <h2 class="display-6 fw-bold portal-page-title mt-3 mb-0">University core values</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="mission-vision-card">
+                    {% if core_values_items %}
+                        <div class="mission-vision-card-body core-values-page-card-body">
+                            <div class="mission-vision-card-top justify-content-center">
+                                <p class="section-eyebrow mb-0">Core Values</p>
+                            </div>
+                            <div class="row g-4 justify-content-center home-core-values-grid core-values-page-grid">
+                                {% for item in core_values_items %}
+                                    <div class="col-sm-6 col-lg-4 col-xl d-flex">
+                                        <article class="shine-value-card core-values-page-value text-center h-100 w-100">
+                                            <span class="shine-value-letter mx-auto">{{ item.letter }}</span>
+                                            <h3 class="shine-value-title">{{ item.title }}</h3>
+                                        </article>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="mission-vision-card-body">
+                            <div class="mission-vision-card-top">
+                                <p class="section-eyebrow mb-0">Core Values</p>
+                            </div>
+                            <div class="mission-vision-copy">
+                                {% if core_values_content %}
+                                    {{ core_values_content|linebreaks }}
+                                {% else %}
+                                    {{ core_values_fallback|linebreaks }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="quality-policy">
+    <div class="container">
+        <div class="portal-page-header-inner mb-4">
+            <div>
+                <span class="section-eyebrow">Quality Policy</span>
+                <h2 class="display-6 fw-bold portal-page-title mt-3 mb-0">University quality policy</h2>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="mission-vision-card">
+                    <div class="mission-vision-card-body">
+                        <div class="mission-vision-card-top">
+                            <p class="section-eyebrow mb-0">Quality Policy</p>
+                        </div>
+                        <div class="mission-vision-copy">
+                            {% if quality_policy_content %}
+                                {{ quality_policy_content|linebreaks }}
+                            {% else %}
+                                {{ quality_policy_fallback|linebreaks }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0 about-section-anchor" id="calendar">
+    <div class="container">
+        <div class="portal-page-header-inner text-center mb-4">
+            <div class="w-100">
+                <span class="section-eyebrow">Calendar</span>
+                <h2 class="display-6 fw-bold portal-page-title mt-3 mb-0">NORSU Calendar 2025-2026</h2>
+            </div>
+        </div>
+        {% if calendar_images %}
+            <div class="row g-4 calendar-gallery">
+                {% for calendar_image in calendar_images %}
+                    <div class="col-12">
+                        <article class="mission-vision-card update-detail-card calendar-gallery-card">
+                            <div class="update-detail-card-body">
+                                <img
+                                    src="{{ calendar_image.image.url }}"
+                                    alt="NORSU Calendar picture {{ forloop.counter }}"
+                                    class="img-fluid rounded-4 border w-100 calendar-gallery-image"
+                                >
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <article class="mission-vision-card update-detail-card">
+                <div class="update-detail-card-body">
+                    <div
+                        class="d-flex align-items-center justify-content-center rounded-4 border bg-white text-secondary fw-semibold"
+                        style="min-height: 24rem;"
+                    >
+                        Picture
+                    </div>
+                </div>
+            </article>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -2,186 +2,275 @@
 {% load content_richtext static %}
 
 {% block title %}Negros Oriental State University{% endblock %}
+{% block body_class %} home-page-body{% endblock %}
 
 {% block content %}
-<section class="hero-section py-5">
-    <div class="container">
-        <div class="hero-panel hero-home-panel">
-            <div class="row">
-                <div class="col-lg-9 col-xl-8">
-                    <span class="hero-kicker">Negros Oriental State University</span>
-                    <h1 class="display-4 fw-bold hero-title mt-3 mb-3">
-                        Empowering Future-Ready Learners Through Meaningful Education
-                    </h1>
-                    <p class="lead hero-copy mb-3">
-                        Explore the university's academic direction, public updates, community milestones, and the six colleges that shape its learning environment.
-                    </p>
-                    <p class="hero-support-copy mb-4">
-                        Join a university committed to innovation, excellence, and community impact.
-                    </p>
-                    <div class="d-flex flex-column flex-sm-row gap-3">
-                        <a class="btn btn-primary btn-lg px-4" href="{% url 'departments:list' %}">Explore Departments</a>
-                        <a class="btn btn-outline-primary btn-lg px-4" href="{% url 'core:updates' %}">View News &amp; Announcements</a>
-                    </div>
+<section class="hero-section home-hero-section home-intro-hero"{% if landing_background_image_url %} style="--home-hero-background-image: url('{{ landing_background_image_url }}'); background-image: linear-gradient(180deg, rgba(4, 10, 18, 0.44) 0%, rgba(4, 10, 18, 0.16) 28%, rgba(4, 10, 18, 0.78) 100%), url('{{ landing_background_image_url }}'); background-position: center; background-size: cover;"{% endif %}>
+    <div class="container home-intro-hero__container">
+        <header class="navbar navbar-expand-lg home-mobile-header d-lg-none" data-bs-theme="dark">
+            <div class="home-mobile-header__shell">
+                <a class="navbar-brand site-brand" href="{% url 'core:home' %}">
+                    <img
+                        src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
+                        alt="NORSU logo"
+                        class="site-brand-logo"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                    >
+                    <span class="site-brand-mark site-brand-mark-fallback">NORSU</span>
+                    <span class="site-brand-copy">
+                        <span class="site-brand-title">Negros Oriental State University</span>
+                        <span class="site-brand-subtitle">Bayawan Sta. Catalina Campus</span>
+                    </span>
+                </a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#homeMobileNav"
+                    aria-controls="homeMobileNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse home-mobile-header__collapse" id="homeMobileNav">
+                    {% include "includes/site_nav_items.html" with nav_prefix="homeMobileNav" %}
+                </div>
+            </div>
+        </header>
+        <div class="home-intro-hero__content text-center" data-reveal>
+            <div class="home-intro-hero__headline-shell">
+                <h1 class="home-intro-hero__headline mt-3 mb-0">
+                    <span id="homeHeroWord" class="home-intro-hero__word is-visible" aria-live="polite">{{ home_intro_phrases|first }}</span>
+                </h1>
+            </div>
+            <div class="home-intro-hero__support">
+                <p class="lead home-intro-hero__copy mb-0 mx-auto">
+                    Explore the university's academic direction, public updates, community milestones, and the colleges that shape its learning environment.
+                </p>
+                <div class="hero-home-actions d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
+                    <a class="btn btn-warning btn-lg px-4" href="#departments">View departments</a>
+                    <a class="btn btn-outline-light btn-lg px-4" href="{% url 'core:about' %}">Learn About NORSU</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section id="mission" class="section-block">
+<section id="updates" class="section-block">
     <div class="container">
-        <div class="section-heading">
-            <h2 class="section-title mb-0">Mission</h2>
+        <div data-reveal>
+            {% include "includes/section_header.html" with eyebrow="Updates" title="Latest announcements and news" description="Recent official notices and news stories shared on both the homepage and the full updates page." %}
         </div>
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="mission-vision-card">
-                    <div class="mission-vision-card-body">
-                        <div class="mission-vision-card-top">
-                            <p class="section-eyebrow mb-0">Mission</p>
-                        </div>
-                        <div class="mission-vision-copy">
-                        {% if school_info and school_info.mission %}
-                            {{ school_info.mission|linebreaks }}
-                        {% else %}
-                            <p>Negros Oriental State University is committed to delivering quality education, responsive research, and meaningful community engagement.</p>
-                        {% endif %}
-                        </div>
-                    </div>
+        {% if latest_updates %}
+            <div id="homeUpdatesFeaturedCarousel" class="carousel slide news-carousel" data-bs-ride="carousel" data-bs-interval="2000" data-bs-pause="hover" aria-label="Latest updates carousel" data-reveal style="--reveal-delay: 0.08s;">
+                <div class="carousel-indicators news-carousel-indicators">
+                    {% for item in latest_updates %}
+                        <button
+                            type="button"
+                            data-bs-target="#homeUpdatesFeaturedCarousel"
+                            data-bs-slide-to="{{ forloop.counter0 }}"
+                            class="{% if forloop.first %}active{% endif %}"
+                            {% if forloop.first %}aria-current="true"{% endif %}
+                            aria-label="Show update {{ forloop.counter }}: {{ item.title }}"
+                        ></button>
+                    {% endfor %}
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="vision" class="section-block section-muted">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-title mb-0">Vision</h2>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="mission-vision-card">
-                    <div class="mission-vision-card-body">
-                        <div class="mission-vision-card-top">
-                            <p class="section-eyebrow mb-0">Vision</p>
+                <div class="carousel-inner">
+                    {% for item in latest_updates %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <a class="news-carousel-card-link" href="{% url 'core:update_detail' item.update_type item.pk %}" aria-label="Read more about {{ item.title }}">
+                                <article class="news-carousel-card">
+                                    <div class="row g-0 align-items-stretch">
+                                        <div class="col-lg-4 news-carousel-media">
+                                            {% if item.video %}
+                                                <div class="news-carousel-video-wrap">
+                                                    <video
+                                                        class="news-carousel-video"
+                                                        muted
+                                                        autoplay
+                                                        loop
+                                                        playsinline
+                                                        preload="metadata"
+                                                        {% if item.image %}poster="{{ item.image.url }}"{% endif %}
+                                                    >
+                                                        <source src="{{ item.video.url }}">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                </div>
+                                            {% elif item.image %}
+                                                <img src="{{ item.image.url }}" class="news-carousel-image" alt="{{ item.title }}">
+                                            {% else %}
+                                                <div class="news-carousel-image-placeholder">
+                                                    <span>{{ item.update_kind }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="news-carousel-body">
+                                                <div class="news-carousel-meta">
+                                                    <span class="news-carousel-meta-chip">{{ item.source_label }}</span>
+                                                    <span class="news-carousel-meta-chip">{{ item.update_kind }}</span>
+                                                    <span class="news-carousel-meta-date"><span class="visually-hidden">{{ item.source_label }} | </span>{{ item.date_posted|date:"M d, Y" }}</span>
+                                                </div>
+                                                <h3 class="news-carousel-title mt-3">{{ item.title }}</h3>
+                                                <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
+                                                    {{ item.content|plain_richtext }}
+                                                </div>
+                                                <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mt-4">
+                                                    <span class="news-carousel-read-more mt-0">Read More</span>
+                                                    <span class="news-carousel-count">{{ forloop.counter }} / {{ latest_updates|length }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </a>
                         </div>
-                        <div class="mission-vision-copy">
-                        {% if school_info and school_info.vision %}
-                            {{ school_info.vision|linebreaks }}
-                        {% else %}
-                            <p>The university envisions a vibrant academic community producing competent, ethical, and globally engaged graduates.</p>
-                        {% endif %}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="strategic-goals" class="section-block">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-title mb-0">Strategic Goals</h2>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="mission-vision-card">
-                    <div class="mission-vision-card-body">
-                        <div class="mission-vision-card-top">
-                            <p class="section-eyebrow mb-0">Strategic Goals</p>
-                        </div>
-                        <div class="mission-vision-copy">
-                        {% if school_info and school_info.strategic_goals %}
-                            {{ school_info.strategic_goals|linebreaks }}
-                        {% else %}
-                            <p>The university's strategic goals will appear here once published by the super admin.</p>
-                        {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section id="core-values" class="section-block section-muted">
-    <div class="container">
-        <div class="section-heading">
-            <h2 class="section-title mb-0">Core Values</h2>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                {% if school_info and school_info.core_values %}
-                    <div class="mission-vision-card">
-                        <div class="mission-vision-card-body">
-                            <div class="mission-vision-card-top">
-                                <p class="section-eyebrow mb-0">Core Values</p>
-                            </div>
-                            <div class="mission-vision-copy">
-                                {{ school_info.core_values|linebreaks }}
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="mission-vision-card">
-                        <div class="mission-vision-card-body">
-                            <div class="mission-vision-card-top">
-                                <p class="section-eyebrow mb-0">Core Values</p>
-                            </div>
-                            <div class="mission-vision-copy">
-                                <p>The university's core values will appear here once published by the super admin.</p>
-                            </div>
+                {% if latest_updates|length > 1 %}
+                    <div class="news-carousel-footer">
+                        <div class="news-carousel-nav">
+                            <button class="news-carousel-control news-carousel-control--prev" type="button" data-bs-target="#homeUpdatesFeaturedCarousel" data-bs-slide="prev" aria-label="Previous update">
+                                <span class="news-carousel-control-icon" aria-hidden="true">&larr;</span>
+                                <span class="news-carousel-control-label">Previous</span>
+                            </button>
+                            <button class="news-carousel-control news-carousel-control--next" type="button" data-bs-target="#homeUpdatesFeaturedCarousel" data-bs-slide="next" aria-label="Next update">
+                                <span class="news-carousel-control-label">Next</span>
+                                <span class="news-carousel-control-icon" aria-hidden="true">&rarr;</span>
+                            </button>
                         </div>
                     </div>
                 {% endif %}
             </div>
-        </div>
+        {% else %}
+            <div class="empty-state">Announcements and news updates will appear here once published.</div>
+        {% endif %}
     </div>
 </section>
 
-<section id="quality-policy" class="section-block">
+<section id="events" class="section-block">
     <div class="container">
-        <div class="section-heading">
-            <h2 class="section-title mb-0">Quality Policy</h2>
+        <div data-reveal>
+            {% include "includes/section_header.html" with eyebrow="Events" title="Upcoming and recent events" description="Academic gatherings, public activities, and department-led events." %}
         </div>
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="mission-vision-card">
-                    <div class="mission-vision-card-body">
-                        <div class="mission-vision-card-top">
-                            <p class="section-eyebrow mb-0">Quality Policy</p>
+        {% if latest_events %}
+            <div id="homeEventsFeaturedCarousel" class="carousel slide news-carousel" data-bs-ride="carousel" data-bs-interval="2000" data-bs-pause="hover" aria-label="Events carousel" data-reveal style="--reveal-delay: 0.12s;">
+                <div class="carousel-indicators news-carousel-indicators">
+                    {% for event in latest_events %}
+                        <button
+                            type="button"
+                            data-bs-target="#homeEventsFeaturedCarousel"
+                            data-bs-slide-to="{{ forloop.counter0 }}"
+                            class="{% if forloop.first %}active{% endif %}"
+                            {% if forloop.first %}aria-current="true"{% endif %}
+                            aria-label="Show event {{ forloop.counter }}: {{ event.title }}"
+                        ></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    {% for event in latest_events %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <a class="news-carousel-card-link" href="{% url 'core:event_detail' event.pk %}" aria-label="View full event: {{ event.title }}">
+                                <article class="news-carousel-card">
+                                    <div class="row g-0 align-items-stretch">
+                                        <div class="col-lg-4 news-carousel-media">
+                                            {% if event.video %}
+                                                <div class="news-carousel-video-wrap">
+                                                    <video
+                                                        class="news-carousel-video"
+                                                        muted
+                                                        autoplay
+                                                        loop
+                                                        playsinline
+                                                        preload="metadata"
+                                                        {% if event.image %}poster="{{ event.image.url }}"{% endif %}
+                                                    >
+                                                        <source src="{{ event.video.url }}">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                </div>
+                                            {% elif event.image %}
+                                                <img src="{{ event.image.url }}" class="news-carousel-image" alt="{{ event.title }}">
+                                            {% else %}
+                                                <div class="news-carousel-image-placeholder">
+                                                    <span>Event</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="news-carousel-body">
+                                                <div class="news-carousel-meta">
+                                                    <span class="news-carousel-meta-chip">{{ event.source_label }}</span>
+                                                    <span class="news-carousel-meta-chip">Event</span>
+                                                    <span class="news-carousel-meta-date">
+                                                        <span class="visually-hidden">{{ event.source_label }} | </span>
+                                                        {% if event.end_date %}
+                                                            {{ event.event_date|date:"M d, Y" }} | {{ event.event_date|date:"g:i A" }} - {{ event.end_date|date:"M d, Y" }} | {{ event.end_date|date:"g:i A" }}
+                                                        {% else %}
+                                                            {{ event.event_date|date:"M d, Y" }}
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                                <h3 class="news-carousel-title mt-3">{{ event.title }}</h3>
+                                                <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
+                                                    {{ event.description|plain_richtext }}
+                                                </div>
+                                                <div class="d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-between mt-4">
+                                                    <div class="d-flex flex-column gap-2">
+                                                        {% if event.location %}
+                                                            <span class="news-carousel-count">{{ event.location }}</span>
+                                                        {% endif %}
+                                                        <span class="btn btn-light event-carousel-button">View Full Event</span>
+                                                    </div>
+                                                    <span class="news-carousel-count">{{ forloop.counter }} / {{ latest_events|length }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </a>
                         </div>
-                        <div class="mission-vision-copy">
-                        {% if school_info and school_info.quality_policy %}
-                            {{ school_info.quality_policy|linebreaks }}
-                        {% else %}
-                            <p>The university's quality policy will appear here once published by the super admin.</p>
-                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if latest_events|length > 1 %}
+                    <div class="news-carousel-footer">
+                        <div class="news-carousel-nav">
+                            <button class="news-carousel-control news-carousel-control--prev" type="button" data-bs-target="#homeEventsFeaturedCarousel" data-bs-slide="prev" aria-label="Previous event">
+                                <span class="news-carousel-control-icon" aria-hidden="true">&larr;</span>
+                                <span class="news-carousel-control-label">Previous</span>
+                            </button>
+                            <button class="news-carousel-control news-carousel-control--next" type="button" data-bs-target="#homeEventsFeaturedCarousel" data-bs-slide="next" aria-label="Next event">
+                                <span class="news-carousel-control-label">Next</span>
+                                <span class="news-carousel-control-icon" aria-hidden="true">&rarr;</span>
+                            </button>
                         </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
-        </div>
+        {% else %}
+            <div class="empty-state">Events will appear here once posted.</div>
+        {% endif %}
     </div>
 </section>
 
 <section id="departments" class="section-block">
     <div class="container">
-        {% include "includes/section_header.html" with eyebrow="Quick Access" title="Featured departments" description="Jump straight into the university's active public department pages." %}
+        <div data-reveal>
+            {% include "includes/section_header.html" with eyebrow="Quick Access" title="Featured departments" description="Jump straight into the university's active public department pages." %}
+        </div>
         <div class="row g-4 mt-1">
             {% for department in featured_departments %}
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 department-card border-0 shadow-sm">
+                    <div class="card h-100 department-card home-feature-card border-0 shadow-sm" data-reveal style="--reveal-delay: 0.{{ forloop.counter }}s; --department-gradient-start: {{ department.theme_color }}; --department-gradient-end: {{ department.theme_gradient_end }};">
                         <div class="card-body department-card-body">
                             <div class="department-card-top">
                                 <div class="department-logo-wrap department-logo-wrap--feature">
                                     {% if department.logo %}
                                         <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
                                     {% else %}
-                                        <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                        <div class="department-logo-placeholder" style="background: linear-gradient(135deg, {{ department.theme_color }}, {{ department.theme_gradient_end }});">
                                             {{ department.code }}
                                         </div>
                                     {% endif %}
@@ -203,4 +292,70 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{{ home_intro_phrases|json_script:"homeIntroWordsData" }}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const textEl = document.getElementById("homeHeroWord");
+    const wordsData = document.getElementById("homeIntroWordsData");
+
+    if (!textEl || !wordsData) {
+        return;
+    }
+
+    let words = [];
+
+    try {
+        words = JSON.parse(wordsData.textContent);
+    } catch (error) {
+        return;
+    }
+
+    if (!Array.isArray(words) || !words.length) {
+        return;
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let index = 0;
+
+    function formatWord(phrase) {
+        const parts = String(phrase || "").trim().split(/\s+/).filter(Boolean);
+        const lastWord = parts.pop() || "";
+        const leadingWords = parts.join(" ");
+
+        if (!leadingWords) {
+            return '<span class="home-intro-hero__word-accent">' + lastWord + "</span>";
+        }
+
+        return leadingWords + ' <span class="home-intro-hero__word-accent">' + lastWord + "</span>";
+    }
+
+    function renderWord(nextIndex) {
+        textEl.innerHTML = formatWord(words[nextIndex]);
+    }
+
+    renderWord(index);
+
+    if (reducedMotion || words.length === 1) {
+        textEl.classList.remove("is-hidden");
+        textEl.classList.add("is-visible");
+        return;
+    }
+
+    window.setInterval(function () {
+        textEl.classList.remove("is-visible");
+        textEl.classList.add("is-hidden");
+
+        window.setTimeout(function () {
+            index = (index + 1) % words.length;
+            renderWord(index);
+            textEl.classList.remove("is-hidden");
+            textEl.classList.add("is-visible");
+        }, 450);
+    }, 2000);
+});
+</script>
 {% endblock %}

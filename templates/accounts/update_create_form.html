@@ -1,7 +1,7 @@
 {% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<section class="row justify-content-center">
+<section class="row justify-content-center dashboard-centered-page">
     <div class="col-xl-9">
         <div class="mission-vision-card portal-form-card">
             <div class="mission-vision-card-body">
@@ -55,9 +55,24 @@
                         <div class="col-12">
                             <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
                             {{ form.image }}
+                            {% if form.image.help_text %}
+                                <div class="form-text mt-2">{{ form.image.help_text }}</div>
+                            {% endif %}
                             {% if form.image.errors %}
                                 <div class="invalid-feedback d-block">
                                     {% for error in form.image.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.video.id_for_label }}" class="form-label">Video</label>
+                            {{ form.video }}
+                            {% if form.video.help_text %}
+                                <div class="form-text mt-2">{{ form.video.help_text }}</div>
+                            {% endif %}
+                            {% if form.video.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.video.errors %}{{ error }}{% endfor %}
                                 </div>
                             {% endif %}
                         </div>

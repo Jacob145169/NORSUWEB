@@ -1,16 +1,21 @@
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import CharField, Q
+from django.db.models import CharField, Q, Count
 from django.db.models.functions import Cast
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.html import strip_tags
 from django.utils import timezone
+from django.utils.text import Truncator
+from django.utils.timesince import timesince
 from django.views import View
 from django.views.generic import CreateView, DeleteView, FormView, ListView, RedirectView, TemplateView, UpdateView
+from django.views.generic import DetailView
 
 from .forms import (
     AdminAuthenticationForm,
@@ -26,6 +31,7 @@ from .forms import (
     NewsForm,
     ProgramForm,
     SchoolInfoForm,
+    SuperAdminAccountUpdateForm,
     UpdateCreateForm,
 )
 from .models import RoleChoices, User
@@ -59,6 +65,22 @@ def build_updates_collection(announcements, news_items):
 
     updates.sort(key=lambda item: item.date_posted, reverse=True)
     return updates
+
+
+def summarize_plain_text(value, word_limit=16):
+    return Truncator(strip_tags(value or "")).words(word_limit, truncate="...")
+
+
+def format_relative_time(value):
+    if not value:
+        return "No recent activity"
+
+    current_time = timezone.now()
+    if timezone.is_aware(value):
+        value = timezone.localtime(value)
+        current_time = timezone.localtime(current_time)
+
+    return f"{timesince(value, current_time).split(',')[0]} ago"
 
 
 def get_scoped_update_querysets(user):
@@ -286,20 +308,182 @@ class AlumniFormMixin(UserFormKwargsMixin, AlumniAccessMixin):
         return context
 
 
+class AlumniDashboardView(DepartmentScopedQuerysetMixin, TemplateView):
+    template_name = "accounts/alumni_dashboard.html"
+    allowed_roles = (RoleChoices.SUPER_ADMIN, RoleChoices.DEPARTMENT_ADMIN)
+
+    def get_alumni_queryset(self):
+        queryset = Alumni.objects.select_related("department").order_by("-batch_year", "full_name")
+        return self.scope_to_user_department(queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        alumni_queryset = self.get_alumni_queryset()
+
+        total_alumni = alumni_queryset.count()
+        public_alumni = alumni_queryset.filter(is_public=True).count()
+        private_alumni = total_alumni - public_alumni
+        batch_count = alumni_queryset.values("batch_year").distinct().count()
+
+        if user.role == RoleChoices.SUPER_ADMIN:
+            context["dashboard_title"] = "Alumni Dashboard"
+            context["page_title"] = "Alumni Dashboard"
+            context["page_description"] = "Monitor alumni records, visibility status, and distribution across departments."
+            context["breakdown_title"] = "Top Departments by Alumni Count"
+            context["breakdown_items"] = alumni_queryset.values(
+                "department__name",
+                "department__code",
+            ).annotate(total=Count("id")).order_by("-total", "department__name")[:8]
+            context["breakdown_empty_message"] = "No department data yet."
+        else:
+            context["dashboard_title"] = f"{user.department.name} Alumni Dashboard"
+            context["page_title"] = "Department Alumni Dashboard"
+            context["page_description"] = f"Track alumni records and visibility for {user.department.name}."
+            context["breakdown_title"] = "Top Courses by Alumni Count"
+            context["breakdown_items"] = alumni_queryset.values(
+                "course_program",
+            ).annotate(total=Count("id")).order_by("-total", "course_program")[:8]
+            context["breakdown_empty_message"] = "No course records yet."
+
+        context["total_alumni"] = total_alumni
+        context["public_alumni"] = public_alumni
+        context["private_alumni"] = private_alumni
+        context["batch_count"] = batch_count
+        context["recent_alumni"] = alumni_queryset[:6]
+        context["can_add_alumni"] = user.role == RoleChoices.DEPARTMENT_ADMIN
+        return context
+
+
 class SuperAdminDashboardView(SuperAdminRequiredMixin, TemplateView):
     template_name = "accounts/super_admin_dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        department_count = Department.objects.count()
+        active_department_count = Department.objects.filter(is_active=True).count()
+        program_count = Program.objects.count()
+        instructor_count = Instructor.objects.count()
+        announcement_count = Announcement.objects.count()
+        news_count = News.objects.count()
+        update_count = announcement_count + news_count
+        event_count = Event.objects.count()
+        alumni_count = Alumni.objects.count()
+
+        draft_update_count = (
+            Announcement.objects.filter(publication_status=PublicationStatus.DRAFT).count()
+            + News.objects.filter(publication_status=PublicationStatus.DRAFT).count()
+        )
+        draft_event_count = Event.objects.filter(publication_status=PublicationStatus.DRAFT).count()
+        published_update_count = (
+            Announcement.objects.filter(publication_status=PublicationStatus.PUBLISHED).count()
+            + News.objects.filter(publication_status=PublicationStatus.PUBLISHED).count()
+        )
+        published_event_count = Event.objects.filter(publication_status=PublicationStatus.PUBLISHED).count()
+        public_alumni_count = Alumni.objects.filter(is_public=True).count()
+        private_alumni_count = alumni_count - public_alumni_count
+        department_admin_count = User.objects.filter(role=RoleChoices.DEPARTMENT_ADMIN).count()
+
+        next_event = (
+            Event.objects.filter(
+                publication_status=PublicationStatus.PUBLISHED,
+                event_date__gte=timezone.now(),
+            )
+            .order_by("event_date")
+            .first()
+        )
+        if next_event:
+            days_until_next_event = max(
+                (timezone.localtime(next_event.event_date).date() - timezone.localdate()).days,
+                0,
+            )
+            if days_until_next_event == 0:
+                next_event_note = "Next public event is today"
+            elif days_until_next_event == 1:
+                next_event_note = "Next public event is tomorrow"
+            else:
+                next_event_note = f"Next public event in {days_until_next_event} days"
+        else:
+            next_event_note = "No upcoming public event"
+
         context["dashboard_title"] = "Super Admin Dashboard"
-        context["overview_stats"] = [
-            {"label": "Total Departments", "value": Department.objects.count()},
-            {"label": "Total Programs", "value": Program.objects.count()},
-            {"label": "Total Instructors", "value": Instructor.objects.count()},
-            {"label": "Total Updates", "value": Announcement.objects.count() + News.objects.count()},
-            {"label": "Total Events", "value": Event.objects.count()},
-            {"label": "Total Alumni", "value": Alumni.objects.count()},
+        context["dashboard_stats"] = [
+            {
+                "title": "Departments",
+                "value": department_count,
+                "note": (
+                    f"{active_department_count} active on the public site"
+                    if active_department_count
+                    else "No active departments published yet"
+                ),
+                "icon": "departments",
+                "badge": "Academic",
+                "theme": "departments",
+                "url": reverse("accounts:department_list"),
+            },
+            {
+                "title": "Programs",
+                "value": program_count,
+                "note": (
+                    f"Across {department_count} academic unit{'s' if department_count != 1 else ''}"
+                    if department_count
+                    else "Waiting for departments to be configured"
+                ),
+                "icon": "programs",
+                "badge": "Curriculum",
+                "theme": "programs",
+                "url": reverse("accounts:program_list"),
+            },
+            {
+                "title": "Instructors",
+                "value": instructor_count,
+                "note": (
+                    f"{department_admin_count} admin-managed department profile{'s' if department_admin_count != 1 else ''}"
+                    if department_admin_count
+                    else "No department admins assigned yet"
+                ),
+                "icon": "instructors",
+                "badge": "Faculty",
+                "theme": "instructors",
+                "url": reverse("accounts:instructor_list"),
+            },
+            {
+                "title": "Updates",
+                "value": update_count,
+                "note": (
+                    f"{draft_update_count} draft item{'s' if draft_update_count != 1 else ''} awaiting publication"
+                    if draft_update_count
+                    else "All current updates are published"
+                ),
+                "icon": "updates",
+                "badge": "Content",
+                "theme": "updates",
+                "url": reverse("accounts:update_list"),
+            },
+            {
+                "title": "Events",
+                "value": event_count,
+                "note": next_event_note,
+                "icon": "events",
+                "badge": "Campus",
+                "theme": "events",
+                "url": reverse("accounts:event_list"),
+            },
+            {
+                "title": "Alumni",
+                "value": alumni_count,
+                "note": (
+                    f"{private_alumni_count} private profile{'s' if private_alumni_count != 1 else ''} awaiting visibility review"
+                    if private_alumni_count
+                    else f"{public_alumni_count} public profile{'s' if public_alumni_count != 1 else ''} visible"
+                ),
+                "icon": "alumni",
+                "badge": "Community",
+                "theme": "alumni",
+                "url": reverse("accounts:alumni_dashboard"),
+            },
         ]
+        context["overview_stats"] = context["dashboard_stats"]
         context["management_sections"] = [
             {
                 "title": "Landing Page and School Content",
@@ -328,20 +512,83 @@ class SuperAdminDashboardView(SuperAdminRequiredMixin, TemplateView):
                 ],
             },
         ]
-        context["quick_links"] = [
-            {"title": "Mission and Vision", "detail": "Edit homepage mission, vision, and history content", "url": reverse("accounts:school_info_update")},
-            {"title": "Departments", "detail": "Create and organize department records", "url": reverse("accounts:department_list")},
-            {"title": "Department Admin Accounts", "detail": "Manage department-level administrator access", "url": reverse("accounts:department_admin_list")},
-            {"title": "Programs", "detail": "Oversee all academic programs", "url": reverse("accounts:program_list")},
-            {"title": "Instructors", "detail": "Maintain instructor profiles", "url": reverse("accounts:instructor_list")},
-            {"title": "Updates", "detail": "Manage announcements and news from one place", "url": reverse("accounts:update_list")},
-            {"title": "Events", "detail": "Manage public events", "url": reverse("accounts:event_list")},
-        ]
-        context["system_highlights"] = {
-            "landing_page_ready": SchoolInfo.objects.exists(),
-            "department_admin_count": User.objects.filter(role=RoleChoices.DEPARTMENT_ADMIN).count(),
-            "active_departments": Department.objects.filter(is_active=True).count(),
-        }
+        recent_activity = []
+        latest_departments = Department.objects.order_by("-updated_at")[:2]
+        latest_updates = build_updates_collection(
+            list(Announcement.objects.select_related("department").order_by("-date_posted")[:3]),
+            list(News.objects.select_related("department").order_by("-date_posted")[:3]),
+        )
+        latest_events = Event.objects.select_related("department").order_by("-date_posted")[:2]
+        latest_admins = (
+            User.objects.select_related("department")
+            .filter(role=RoleChoices.DEPARTMENT_ADMIN)
+            .order_by("-date_joined")[:2]
+        )
+
+        for department in latest_departments:
+            recent_activity.append(
+                {
+                    "timestamp": department.updated_at,
+                    "category": "Department",
+                    "title": department.name,
+                    "meta": "Department profile",
+                    "detail": (
+                        department.description
+                        or "Department information and public-facing settings are ready for review."
+                    ),
+                    "url": reverse("accounts:department_update", args=[department.pk]),
+                }
+            )
+
+        for item in latest_updates[:3]:
+            recent_activity.append(
+                {
+                    "timestamp": item.date_posted,
+                    "category": item.update_kind,
+                    "title": item.title,
+                    "meta": item.source_label,
+                    "detail": (
+                        summarize_plain_text(item.content, word_limit=16)
+                        or f"{item.source_label} content is available in the updates workspace."
+                    ),
+                    "url": reverse("accounts:update_list"),
+                }
+            )
+
+        for event in latest_events:
+            recent_activity.append(
+                {
+                    "timestamp": event.date_posted,
+                    "category": "Event",
+                    "title": event.title,
+                    "meta": event.department.name if event.department_id else "University",
+                    "detail": event.schedule_label
+                    + (f" | {event.location}" if event.location else ""),
+                    "url": reverse("accounts:event_list"),
+                }
+            )
+
+        for admin in latest_admins:
+            recent_activity.append(
+                {
+                    "timestamp": admin.date_joined,
+                    "category": "Admin",
+                    "title": admin.full_name or admin.username,
+                    "meta": "Department admin account",
+                    "detail": (
+                        f"Admin access assigned to {admin.department.name}."
+                        if admin.department_id
+                        else "Admin access created for the portal."
+                    ),
+                    "url": reverse("accounts:department_admin_list"),
+                }
+            )
+
+        recent_activity.sort(key=lambda item: item["timestamp"], reverse=True)
+        for item in recent_activity:
+            item["time_ago"] = format_relative_time(item["timestamp"])
+
+        context["recent_activity"] = recent_activity[:4]
         context["school_info"] = SchoolInfo.objects.first()
         return context
 
@@ -350,13 +597,43 @@ class SchoolInfoUpdateView(PageMetadataMixin, SuccessMessageMixin, SuperAdminReq
     template_name = "accounts/school_info_form.html"
     form_class = SchoolInfoForm
     success_url = reverse_lazy("accounts:super_admin_dashboard")
-    dashboard_title = "Edit Homepage Content"
-    page_title = "Edit Homepage Mission, Vision, Strategic Goals, Core Values, Quality Policy, History, and Image"
-    page_description = "Update the college name, mission, vision, strategic goals, core values, quality policy, history, and the history page image used on the public site."
-    success_message = "Landing page content and history media have been updated successfully."
+    dashboard_title = "Edit Homepage and NORSU Calendar"
+    page_title = "Edit Homepage, NORSU Calendar, Mission, Vision, Strategic Goals, Core Values, Quality Policy, History, and Images"
+    page_description = "Update the homepage hero content, upload one or more NORSU Calendar pictures, and maintain the history page media used across the public site."
+    success_message = "Homepage, NORSU Calendar pictures, and history content have been updated successfully."
 
     def get_object(self, queryset=None):
         return SchoolInfo.get_solo()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["calendar_images"] = self.object.calendar_images.all()
+        form = context.get("form")
+        selected_top_calendar_image_id = ""
+        if form is not None:
+            selected_top_calendar_image_id = form["top_calendar_image"].value() or ""
+        context["selected_top_calendar_image_id"] = str(selected_top_calendar_image_id)
+        return context
+
+
+class SuperAdminAccountUpdateView(PageMetadataMixin, SuccessMessageMixin, SuperAdminRequiredMixin, UpdateView):
+    template_name = "accounts/super_admin_account_form.html"
+    form_class = SuperAdminAccountUpdateForm
+    success_url = reverse_lazy("accounts:super_admin_dashboard")
+    dashboard_title = "Account Settings"
+    page_title = "Super Admin Account Settings"
+    page_description = "Update your super admin name, username, email, and password."
+    submit_label = "Save Changes"
+    success_message = "Super admin account settings updated successfully."
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if form.cleaned_data.get("password1"):
+            update_session_auth_hash(self.request, self.object)
+        return response
 
 class DepartmentManagementMixin(SuperAdminRequiredMixin):
     model = Department
@@ -439,6 +716,15 @@ class DepartmentAdminListView(PageMetadataMixin, DepartmentAdminManagementMixin,
     def get_queryset(self):
         return self.get_department_admin_queryset()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        assigned_department_ids = User.objects.filter(
+            role=RoleChoices.DEPARTMENT_ADMIN,
+            department__isnull=False,
+        ).values_list("department_id", flat=True)
+        context["departments_without_admins"] = Department.objects.exclude(pk__in=assigned_department_ids).order_by("name")
+        return context
+
 
 class DepartmentAdminCreateView(PageMetadataMixin, SuccessMessageMixin, DepartmentAdminManagementMixin, CreateView):
     template_name = "accounts/department_admin_form.html"
@@ -449,12 +735,19 @@ class DepartmentAdminCreateView(PageMetadataMixin, SuccessMessageMixin, Departme
     submit_label = "Create Account"
     success_message = "Department admin account created successfully."
 
+    def get_initial(self):
+        initial = super().get_initial()
+        department_id = self.request.GET.get("department")
+        if department_id and Department.objects.filter(pk=department_id).exists():
+            initial["department"] = department_id
+        return initial
+
 
 class DepartmentAdminUpdateView(PageMetadataMixin, SuccessMessageMixin, DepartmentAdminManagementMixin, UpdateView):
     template_name = "accounts/department_admin_form.html"
     form_class = DepartmentAdminUpdateForm
     dashboard_title = "Edit Department Admin"
-    page_description = "Update the account profile, department assignment, and activation status."
+    page_description = "Update the username, password, account profile, and activation status for this department admin."
     submit_label = "Save Changes"
     success_message = "Department admin account updated successfully."
 
@@ -484,7 +777,12 @@ class ProgramListView(ProgramAccessMixin, ListView):
     context_object_name = "programs"
 
     def get_queryset(self):
-        return self.get_program_queryset()
+        queryset = self.get_program_queryset()
+        if self.request.user.role == RoleChoices.SUPER_ADMIN:
+            department_id = self.request.GET.get("department")
+            if department_id:
+                queryset = queryset.filter(department_id=department_id)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -494,16 +792,24 @@ class ProgramListView(ProgramAccessMixin, ListView):
             context["dashboard_title"] = "Program Management"
             context["page_title"] = "Program Management"
             context["page_description"] = "Manage academic programs across all departments."
+            context["departments"] = Department.objects.order_by("name")
+            context["selected_department"] = self.request.GET.get("department", "")
         else:
             context["dashboard_title"] = f"{user.department.name} Programs"
             context["page_title"] = "Department Program Management"
-            context["page_description"] = f"Manage programs for {user.department.name} only."
+            context["page_description"] = f"Manage programs and course uniform details for {user.department.name} only."
 
         return context
 
 
 class ProgramCreateView(ProgramFormMixin, CreateView):
     template_name = "accounts/program_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != RoleChoices.DEPARTMENT_ADMIN:
+            messages.warning(request, "Only department admins can add new programs.")
+            return redirect("accounts:program_list")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         messages.success(self.request, "Program created successfully.")
@@ -513,13 +819,22 @@ class ProgramCreateView(ProgramFormMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["dashboard_title"] = "Add Program"
         context["page_title"] = "Add Program"
-        context["page_description"] = "Create a program record with abbreviation, full name, and department assignment."
+        if self.request.user.role == RoleChoices.DEPARTMENT_ADMIN:
+            context["page_description"] = "Create a program record and set the public course uniform details for your department."
+        else:
+            context["page_description"] = "Create a program record with abbreviation, full name, and department assignment."
         context["submit_label"] = "Create Program"
         return context
 
 
 class ProgramUpdateView(ProgramFormMixin, UpdateView):
     template_name = "accounts/program_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != RoleChoices.DEPARTMENT_ADMIN:
+            messages.warning(request, "Only department admins can update programs.")
+            return redirect("accounts:program_list")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.get_program_queryset()
@@ -532,7 +847,10 @@ class ProgramUpdateView(ProgramFormMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["dashboard_title"] = "Edit Program"
         context["page_title"] = f"Edit {self.object.program_code}"
-        context["page_description"] = "Update the program abbreviation, full name, description, and department assignment."
+        if self.request.user.role == RoleChoices.DEPARTMENT_ADMIN:
+            context["page_description"] = "Update the program details and its public course uniform information."
+        else:
+            context["page_description"] = "Update the program abbreviation, full name, description, and department assignment."
         context["submit_label"] = "Save Changes"
         return context
 
@@ -540,6 +858,12 @@ class ProgramUpdateView(ProgramFormMixin, UpdateView):
 class ProgramDeleteView(ProgramAccessMixin, DeleteView):
     template_name = "accounts/program_confirm_delete.html"
     success_url = reverse_lazy("accounts:program_list")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != RoleChoices.DEPARTMENT_ADMIN:
+            messages.warning(request, "Only department admins can delete programs.")
+            return redirect("accounts:program_list")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.get_program_queryset()
@@ -561,7 +885,12 @@ class InstructorListView(InstructorAccessMixin, ListView):
     context_object_name = "instructors"
 
     def get_queryset(self):
-        return self.get_instructor_queryset()
+        queryset = self.get_instructor_queryset()
+        if self.request.user.role == RoleChoices.SUPER_ADMIN:
+            department_id = self.request.GET.get("department")
+            if department_id:
+                queryset = queryset.filter(department_id=department_id)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -571,6 +900,8 @@ class InstructorListView(InstructorAccessMixin, ListView):
             context["dashboard_title"] = "Instructor Management"
             context["page_title"] = "Instructor Management"
             context["page_description"] = "Manage instructor profiles across all departments."
+            context["departments"] = Department.objects.order_by("name")
+            context["selected_department"] = self.request.GET.get("department", "")
         else:
             context["dashboard_title"] = f"{user.department.name} Instructors"
             context["page_title"] = "Department Instructor Management"
@@ -581,6 +912,12 @@ class InstructorListView(InstructorAccessMixin, ListView):
 
 class InstructorCreateView(InstructorFormMixin, CreateView):
     template_name = "accounts/instructor_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role != RoleChoices.DEPARTMENT_ADMIN:
+            messages.warning(request, "Only department admins can add new instructors.")
+            return redirect("accounts:instructor_list")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         messages.success(self.request, "Instructor created successfully.")
@@ -611,6 +948,21 @@ class InstructorUpdateView(InstructorFormMixin, UpdateView):
         context["page_title"] = f"Edit {self.object.full_name}"
         context["page_description"] = "Update the instructor profile, photo, and department assignment."
         context["submit_label"] = "Save Changes"
+        return context
+
+
+class InstructorDetailView(InstructorAccessMixin, DetailView):
+    template_name = "accounts/instructor_detail.html"
+    context_object_name = "instructor"
+
+    def get_queryset(self):
+        return self.get_instructor_queryset()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dashboard_title"] = "Instructor Profile"
+        context["page_title"] = self.object.full_name
+        context["page_description"] = "Instructor profile details."
         return context
 
 
@@ -808,21 +1160,49 @@ class EventListView(EventAccessMixin, ListView):
     template_name = "accounts/event_list.html"
     context_object_name = "events"
 
+    def get_selected_event_status(self):
+        return "draft" if self.request.GET.get("status") == "draft" else "published"
+
+    def get_filtered_queryset(self):
+        queryset = self.get_event_queryset()
+
+        if self.get_selected_event_status() == "draft":
+            return queryset.filter(publication_status=PublicationStatus.DRAFT)
+
+        return queryset.filter(publication_status=PublicationStatus.PUBLISHED)
+
     def get_queryset(self):
-        return self.get_event_queryset()
+        return self.get_filtered_queryset()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        selected_event_status = self.get_selected_event_status()
+        base_queryset = self.get_event_queryset()
 
-        if user.role == RoleChoices.SUPER_ADMIN:
-            context["dashboard_title"] = "Event Management"
-            context["page_title"] = "Event Management"
-            context["page_description"] = "Manage events across all departments."
+        context["selected_event_status"] = selected_event_status
+        context["draft_events_url"] = f"{reverse('accounts:event_list')}?status=draft"
+        context["published_events_url"] = reverse("accounts:event_list")
+        context["draft_events_count"] = base_queryset.filter(publication_status=PublicationStatus.DRAFT).count()
+
+        if selected_event_status == "draft":
+            if user.role == RoleChoices.SUPER_ADMIN:
+                context["dashboard_title"] = "Event Drafts"
+                context["page_title"] = "Event Drafts"
+                context["page_description"] = "Manage saved draft events across all departments."
+            else:
+                context["dashboard_title"] = f"{user.department.name} Event Drafts"
+                context["page_title"] = "Department Event Drafts"
+                context["page_description"] = f"Manage saved draft events for {user.department.name} only."
         else:
-            context["dashboard_title"] = f"{user.department.name} Events"
-            context["page_title"] = "Department Event Management"
-            context["page_description"] = f"Manage events for {user.department.name} only."
+            if user.role == RoleChoices.SUPER_ADMIN:
+                context["dashboard_title"] = "Event Management"
+                context["page_title"] = "Event Management"
+                context["page_description"] = "Manage published events across all departments."
+            else:
+                context["dashboard_title"] = f"{user.department.name} Events"
+                context["page_title"] = "Department Event Management"
+                context["page_description"] = f"Manage published events for {user.department.name} only."
 
         return context
 
@@ -840,6 +1220,7 @@ class EventCreateView(EventFormMixin, CreateView):
             context["page_description"] = "Create an event entry for the public site."
         context["submit_label"] = "Publish Event"
         context["draft_label"] = "Save Draft"
+        context["back_to_events_url"] = reverse("accounts:event_list")
         return context
 
 
@@ -858,15 +1239,24 @@ class EventUpdateView(EventFormMixin, UpdateView):
         else:
             context["page_description"] = "Update the event details, schedule, image, and department assignment."
         context.update(self.get_submit_labels())
+        context["back_to_events_url"] = (
+            f"{reverse('accounts:event_list')}?status=draft"
+            if self.object.is_draft
+            else reverse("accounts:event_list")
+        )
         return context
 
 
 class EventDeleteView(EventAccessMixin, DeleteView):
     template_name = "accounts/event_confirm_delete.html"
-    success_url = reverse_lazy("accounts:event_list")
 
     def get_queryset(self):
         return self.get_event_queryset()
+
+    def get_success_url(self):
+        if getattr(self.object, "is_draft", False):
+            return f"{reverse('accounts:event_list')}?status=draft"
+        return reverse("accounts:event_list")
 
     def form_valid(self, form):
         messages.success(self.request, "Event deleted successfully.")
@@ -877,6 +1267,11 @@ class EventDeleteView(EventAccessMixin, DeleteView):
         context["dashboard_title"] = "Delete Event"
         context["page_title"] = f"Delete {self.object.title}"
         context["page_description"] = "This action removes the selected event."
+        context["back_to_events_url"] = (
+            f"{reverse('accounts:event_list')}?status=draft"
+            if self.object.is_draft
+            else reverse("accounts:event_list")
+        )
         return context
 
 
@@ -1355,7 +1750,7 @@ class DepartmentAdminDashboardView(DepartmentAdminRequiredMixin, TemplateView):
             },
             {
                 "title": "Edit Department Profile",
-                "detail": "Update your mission, vision, leadership details, and banner for the public page.",
+                "detail": "Update your mission, vision, leadership details, and banner.",
                 "url": reverse("accounts:department_leadership_update"),
                 "icon": "dean",
                 "button_label": "Edit",

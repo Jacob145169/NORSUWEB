@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | Negros Oriental State University{% endblock %}
+
+{% block extra_css %}
+<style>
+.contact-method-card {
+    height: 100%;
+}
+
+.contact-method-label {
+    color: var(--theme-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    margin-bottom: 0;
+    text-transform: uppercase;
+}
+
+.contact-method-value,
+.contact-method-value a {
+    color: var(--theme-text);
+    font-size: clamp(1.2rem, 1rem + 0.42vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+.contact-method-value a:hover,
+.contact-method-value a:focus {
+    color: var(--theme-accent);
+}
+
+.contact-method-copy {
+    color: var(--theme-muted);
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="container">
+        <div class="portal-page-header-inner text-center">
+            <div class="w-100">
+                <span class="section-eyebrow">Contact</span>
+                <h1 class="display-5 fw-bold portal-page-title mt-3 mb-3">{{ page_heading }}</h1>
+                <p class="portal-page-copy mb-0 mx-auto">{{ page_description }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            {% for item in contact_items %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="mission-vision-card contact-method-card">
+                        <div class="mission-vision-card-body">
+                            <p class="contact-method-label">{{ item.label }}</p>
+                            <div class="contact-method-value">
+                                {% if item.href %}
+                                    <a href="{{ item.href }}">{{ item.value }}</a>
+                                {% else %}
+                                    {{ item.value }}
+                                {% endif %}
+                            </div>
+                            <p class="contact-method-copy">{{ item.description }}</p>
+                        </div>
+                    </article>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -18,7 +18,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-10">
-                <div class="{% if is_history_page %}history-card{% else %}mission-vision-card{% endif %}">
+                <div class="{% if is_history_page %}history-card{% else %}mission-vision-card{% endif %}{% if is_strategic_goals_page %} strategic-goal-shell{% endif %}">
                     {% if is_history_page %}
                         <div class="history-card-layout{% if history_image_url %} history-card-layout--with-media{% endif %}">
                             <div class="history-card-copy">
@@ -42,6 +42,41 @@
                                         {{ fallback_content|linebreaksbr }}
                                     {% endif %}
                                 </div>
+                            </div>
+                        </div>
+                    {% elif is_core_values_page and core_values_items %}
+                        <div class="mission-vision-card-body core-values-page-card-body">
+                            <div class="mission-vision-card-top justify-content-center">
+                                <p class="section-eyebrow mb-0">{{ section_label }}</p>
+                            </div>
+                            <div class="row g-4 justify-content-center home-core-values-grid core-values-page-grid">
+                                {% for item in core_values_items %}
+                                    <div class="col-sm-6 col-lg-4 col-xl d-flex">
+                                        <article class="shine-value-card core-values-page-value text-center h-100 w-100">
+                                            <span class="shine-value-letter mx-auto">{{ item.letter }}</span>
+                                            <h2 class="shine-value-title">{{ item.title }}</h2>
+                                        </article>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% elif is_strategic_goals_page and strategic_goal_cards %}
+                        <div class="mission-vision-card-body core-values-page-card-body">
+                            <div class="mission-vision-card-top justify-content-center">
+                                <p class="section-eyebrow mb-0">{{ section_label }}</p>
+                            </div>
+                            <div class="mission-vision-copy strategic-goal-page-intro">
+                                <p>Negros Oriental State University will:</p>
+                            </div>
+                                <div class="row g-4 justify-content-center home-core-values-grid core-values-page-grid strategic-goal-page-grid">
+                                    {% for card in strategic_goal_cards %}
+                                        <div class="col-12 d-flex strategic-goal-page-column">
+                                        <article class="shine-value-card core-values-page-value strategic-goal-page-value h-100 w-100">
+                                            <span class="shine-value-letter strategic-goal-page-number">{{ card.badge }}</span>
+                                            <h2 class="shine-value-title strategic-goal-page-title mb-0">{{ card.text }}</h2>
+                                        </article>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                     {% else %}

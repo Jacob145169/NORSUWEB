@@ -41,8 +41,23 @@
                             <a class="news-carousel-card-link" href="{% url 'core:update_detail' item.update_type item.pk %}" aria-label="Read more about {{ item.title }}">
                                 <article class="news-carousel-card">
                                     <div class="row g-0 align-items-stretch">
-                                        <div class="col-lg-4 news-carousel-media">
-                                            {% if item.image %}
+                                    <div class="col-lg-4 news-carousel-media">
+                                            {% if item.video %}
+                                                <div class="news-carousel-video-wrap">
+                                                    <video
+                                                        class="news-carousel-video"
+                                                        muted
+                                                        autoplay
+                                                        loop
+                                                        playsinline
+                                                        preload="metadata"
+                                                        {% if item.image %}poster="{{ item.image.url }}"{% endif %}
+                                                    >
+                                                        <source src="{{ item.video.url }}">
+                                                        Your browser does not support the video tag.
+                                                    </video>
+                                                </div>
+                                            {% elif item.image %}
                                                 <img src="{{ item.image.url }}" class="news-carousel-image" alt="{{ item.title }}">
                                             {% else %}
                                                 <div class="news-carousel-image-placeholder">
@@ -55,7 +70,7 @@
                                                 <div class="news-carousel-meta">
                                                     <span class="news-carousel-meta-chip">{{ item.source_label }}</span>
                                                     <span class="news-carousel-meta-chip">{{ item.update_kind }}</span>
-                                                    <span class="news-carousel-meta-date">{{ item.date_posted|date:"M d, Y" }}</span>
+                                                    <span class="news-carousel-meta-date"><span class="visually-hidden">{{ item.source_label }} | </span>{{ item.date_posted|date:"M d, Y" }}</span>
                                                 </div>
                                                 <h3 class="news-carousel-title mt-3">{{ item.title }}</h3>
                                                 <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
@@ -76,13 +91,13 @@
                 {% if latest_updates|length > 1 %}
                     <div class="news-carousel-footer">
                         <div class="news-carousel-nav">
-                            <button class="carousel-control-prev news-carousel-control" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous update</span>
+                            <button class="news-carousel-control news-carousel-control--prev" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="prev" aria-label="Previous update">
+                                <span class="news-carousel-control-icon" aria-hidden="true">&larr;</span>
+                                <span class="news-carousel-control-label">Previous</span>
                             </button>
-                            <button class="carousel-control-next news-carousel-control" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next update</span>
+                            <button class="news-carousel-control news-carousel-control--next" type="button" data-bs-target="#updatesFeaturedCarousel" data-bs-slide="next" aria-label="Next update">
+                                <span class="news-carousel-control-label">Next</span>
+                                <span class="news-carousel-control-icon" aria-hidden="true">&rarr;</span>
                             </button>
                         </div>
                     </div>
@@ -117,7 +132,22 @@
                             <article class="news-carousel-card">
                                 <div class="row g-0 align-items-stretch">
                                     <div class="col-lg-4 news-carousel-media">
-                                        {% if event.image %}
+                                        {% if event.video %}
+                                            <div class="news-carousel-video-wrap">
+                                                <video
+                                                    class="news-carousel-video"
+                                                    muted
+                                                    autoplay
+                                                    loop
+                                                    playsinline
+                                                    preload="metadata"
+                                                    {% if event.image %}poster="{{ event.image.url }}"{% endif %}
+                                                >
+                                                    <source src="{{ event.video.url }}">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            </div>
+                                        {% elif event.image %}
                                             <img src="{{ event.image.url }}" class="news-carousel-image" alt="{{ event.title }}">
                                         {% else %}
                                             <div class="news-carousel-image-placeholder">
@@ -130,7 +160,14 @@
                                             <div class="news-carousel-meta">
                                                 <span class="news-carousel-meta-chip">{{ event.source_label }}</span>
                                                 <span class="news-carousel-meta-chip">Event</span>
-                                                <span class="news-carousel-meta-date">{{ event.event_date|date:"M d, Y" }}</span>
+                                                <span class="news-carousel-meta-date">
+                                                    <span class="visually-hidden">{{ event.source_label }} | </span>
+                                                    {% if event.end_date %}
+                                                        {{ event.event_date|date:"M d, Y" }} | {{ event.event_date|date:"g:i A" }} - {{ event.end_date|date:"M d, Y" }} | {{ event.end_date|date:"g:i A" }}
+                                                    {% else %}
+                                                        {{ event.event_date|date:"M d, Y" }}
+                                                    {% endif %}
+                                                </span>
                                             </div>
                                             <h3 class="news-carousel-title mt-3">{{ event.title }}</h3>
                                             <div class="news-carousel-copy richtext-content richtext-content--light richtext-content--clamp">
@@ -155,13 +192,13 @@
                 {% if latest_events|length > 1 %}
                     <div class="news-carousel-footer">
                         <div class="news-carousel-nav">
-                            <button class="carousel-control-prev news-carousel-control" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous event</span>
+                            <button class="news-carousel-control news-carousel-control--prev" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="prev" aria-label="Previous event">
+                                <span class="news-carousel-control-icon" aria-hidden="true">&larr;</span>
+                                <span class="news-carousel-control-label">Previous</span>
                             </button>
-                            <button class="carousel-control-next news-carousel-control" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next event</span>
+                            <button class="news-carousel-control news-carousel-control--next" type="button" data-bs-target="#eventsFeaturedCarousel" data-bs-slide="next" aria-label="Next event">
+                                <span class="news-carousel-control-label">Next</span>
+                                <span class="news-carousel-control-icon" aria-hidden="true">&rarr;</span>
                             </button>
                         </div>
                     </div>

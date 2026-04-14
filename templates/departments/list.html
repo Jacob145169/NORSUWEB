@@ -3,20 +3,27 @@
 {% block title %}Departments | Negros Oriental State University{% endblock %}
 
 {% block content %}
-<section class="section-block">
+<section class="department-directory-hero">
     <div class="container">
-        {% include "includes/section_header.html" with eyebrow="Departments" title="Colleges and academic units" description="Browse public department pages for programs, faculty, updates, and alumni highlights." %}
+        <div data-reveal>
+            {% include "includes/section_header.html" with eyebrow="Departments" title="Colleges and academic units" description="Browse public department pages for programs, faculty, updates, and alumni highlights." %}
+        </div>
+    </div>
+</section>
+
+<section class="section-block pt-0">
+    <div class="container">
         <div class="row g-4 mt-1">
             {% for department in departments %}
                 <div class="col-md-6 col-xl-4">
-                    <div class="card h-100 department-card border-0 shadow-sm">
+                    <div class="card h-100 department-card department-motion-card border-0 shadow-sm" data-reveal style="--reveal-delay: 0.{{ forloop.counter }}s; --department-gradient-start: {{ department.theme_color }}; --department-gradient-end: {{ department.theme_gradient_end }};">
                         <div class="card-body department-card-body">
                             <div class="department-card-top">
                                 <div class="department-logo-wrap department-logo-wrap--feature">
                                     {% if department.logo %}
                                         <img src="{{ department.logo.url }}" alt="{{ department.name }} logo" class="department-logo">
                                     {% else %}
-                                        <div class="department-logo-placeholder" style="background-color: {{ department.theme_color }};">
+                                        <div class="department-logo-placeholder" style="background: linear-gradient(135deg, {{ department.theme_color }}, {{ department.theme_gradient_end }});">
                                             {{ department.code }}
                                         </div>
                                     {% endif %}
@@ -32,7 +39,7 @@
                 </div>
             {% empty %}
                 <div class="col-12">
-                    <div class="empty-state">Department information will appear here once it is added.</div>
+                    <div class="empty-state" data-reveal>Department information will appear here once it is added.</div>
                 </div>
             {% endfor %}
         </div>

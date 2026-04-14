@@ -1,30 +1,51 @@
 {% extends "accounts/dashboard_base.html" %}
 
 {% block dashboard_content %}
-<section class="row justify-content-center">
+<section class="row justify-content-center dashboard-centered-page">
     <div class="col-xl-11">
         <div class="mission-vision-card">
             <div class="mission-vision-card-body">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
-                    <div>
-                        <p class="section-eyebrow">Programs</p>
-                        <h1 class="section-title mb-2">{{ page_title }}</h1>
-                        <p class="mb-0 text-secondary">{{ page_description }}</p>
-                    </div>
-                    <div class="d-flex flex-column flex-sm-row gap-2">
-                        <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
-                        <a href="{% url 'accounts:program_create' %}" class="btn btn-primary">Add Program</a>
-                    </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+                <div>
+                    <p class="section-eyebrow">Programs</p>
+                    <h1 class="section-title mb-2">{{ page_title }}</h1>
+                    <p class="mb-0 text-secondary">{{ page_description }}</p>
                 </div>
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-primary">Back to Dashboard</a>
+                    {% if request.user.role == "department_admin" %}
+                        <a href="{% url 'accounts:program_create' %}" class="btn btn-primary">Add Program</a>
+                    {% endif %}
+                </div>
+            </div>
 
-                <div class="table-responsive">
+            {% if request.user.role == "super_admin" %}
+                <form method="get" class="row g-3 align-items-end mb-4">
+                    <div class="col-md-6 col-lg-4">
+                        <label for="department-filter" class="form-label">Filter by Department</label>
+                        <select id="department-filter" name="department" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Departments</option>
+                            {% for department in departments %}
+                                <option value="{{ department.pk }}" {% if selected_department == department.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ department.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 col-lg-4 d-flex gap-2"></div>
+                </form>
+            {% endif %}
+
+            <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0 program-table">
                         <thead>
                             <tr>
                                 <th scope="col">Program</th>
                                 <th scope="col">Department</th>
                                 <th scope="col">Description</th>
-                                <th scope="col" class="text-end">Actions</th>
+                                {% if request.user.role == "department_admin" %}
+                                    <th scope="col" class="text-end">Actions</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -35,16 +56,38 @@
                                     </td>
                                     <td>{{ program.department.name }}</td>
                                     <td class="text-secondary">{{ program.description|default:"No description provided."|truncatewords:18 }}</td>
-                                    <td class="text-end">
-                                        <div class="d-inline-flex flex-wrap justify-content-end gap-2">
-                                            <a href="{% url 'accounts:program_update' program.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
-                                            <a href="{% url 'accounts:program_delete' program.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
-                                        </div>
-                                    </td>
+                                    {% if request.user.role == "department_admin" %}
+                                        <td class="text-end">
+                                            <div class="table-action-row">
+                                                <a
+                                                    href="{% url 'accounts:program_update' program.pk %}"
+                                                    class="table-icon-action table-icon-action--edit"
+                                                    aria-label="Edit {{ program.program_code }}"
+                                                    title="Edit"
+                                                >
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                        <path d="M4 20h4.75L19 9.75 14.25 5 4 15.25V20Zm2-1.5v-2.63l8.25-8.25 2.63 2.63-8.25 8.25H6ZM18.3 8.33l-2.63-2.63 1.03-1.02a1.5 1.5 0 0 1 2.12 0l.5.5a1.5 1.5 0 0 1 0 2.12L18.3 8.33Z"/>
+                                                    </svg>
+                                                    <span class="visually-hidden">Edit</span>
+                                                </a>
+                                                <a
+                                                    href="{% url 'accounts:program_delete' program.pk %}"
+                                                    class="table-icon-action table-icon-action--delete"
+                                                    aria-label="Delete {{ program.program_code }}"
+                                                    title="Delete"
+                                                >
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                        <path d="M9 3.75h6a1 1 0 0 1 1 1V6h3a.75.75 0 0 1 0 1.5h-1.04l-.77 11.01A2.5 2.5 0 0 1 14.7 21H9.3a2.5 2.5 0 0 1-2.49-2.49L6.04 7.5H5a.75.75 0 0 1 0-1.5h3V4.75a1 1 0 0 1 1-1Zm.5 2.25h5V5.25h-5V6Zm-1.19 1.5.74 10.91a1 1 0 0 0 1 .94h5.9a1 1 0 0 0 1-.94l.74-10.91H8.31ZM10.5 10a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0v-5.5A.75.75 0 0 1 10.5 10Zm3 0a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0v-5.5A.75.75 0 0 1 13.5 10Z"/>
+                                                    </svg>
+                                                    <span class="visually-hidden">Delete</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="{% if request.user.role == 'department_admin' %}4{% else %}3{% endif %}">
                                         <div class="empty-state my-3">No program records are available yet.</div>
                                     </td>
                                 </tr>

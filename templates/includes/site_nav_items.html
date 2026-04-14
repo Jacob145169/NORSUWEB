@@ -1,0 +1,51 @@
+{% with current_view=request.resolver_match.view_name current_app=request.resolver_match.app_name %}
+<ul class="navbar-nav ms-auto align-items-lg-center site-nav-list">
+    <li class="nav-item site-nav-item"><a class="nav-link{% if current_view == 'core:home' %} is-active{% endif %}" href="{% url 'core:home' %}">Home</a></li>
+    <li class="nav-item site-nav-item dropdown">
+        <a
+            class="nav-link dropdown-toggle{% if current_view == 'core:about' or current_view == 'core:history' or current_view == 'core:mission_vision' or current_view == 'core:strategic_goals' or current_view == 'core:core_values' or current_view == 'core:quality_policy' or current_view == 'core:calendar' %} is-active{% endif %}"
+            href="{% url 'core:about' %}"
+            id="{{ nav_prefix }}AboutDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
+            <span>About</span>
+            <span class="site-nav-dropdown-caret-text" aria-hidden="true">&#9662;</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end site-menu-dropdown" aria-labelledby="{{ nav_prefix }}AboutDropdown">
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#history">History</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#mission-vision">Mission &amp; Vision</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#strategic-goals">Strategic Goals</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#core-values">Core Values</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#quality-policy">Quality Policy</a></li>
+            <li><a class="dropdown-item" href="{% url 'core:about' %}#calendar">NORSU Calendar</a></li>
+        </ul>
+    </li>
+    <li class="nav-item site-nav-item"><a class="nav-link{% if current_view == 'core:updates' or current_view == 'core:update_detail' %} is-active{% endif %}" href="{% url 'core:updates' %}">Updates</a></li>
+    <li class="nav-item site-nav-item"><a class="nav-link{% if current_app == 'departments' %} is-active{% endif %}" href="{% url 'departments:list' %}">Departments</a></li>
+    <li class="nav-item site-nav-item"><a class="nav-link{% if current_view == 'core:alumni' %} is-active{% endif %}" href="{% url 'core:alumni' %}">Alumni</a></li>
+    <li class="nav-item site-nav-item"><a class="nav-link{% if current_view == 'core:contact' %} is-active{% endif %}" href="{% url 'core:contact' %}">Contact</a></li>
+    <li class="nav-item site-nav-item site-theme-toggle-item ms-lg-2 mt-3 mt-lg-0">
+        <button
+            class="btn site-theme-toggle"
+            type="button"
+            data-site-theme-toggle
+            aria-label="Switch to night mode"
+            aria-pressed="false"
+            title="Switch to night mode"
+        >
+            <span class="site-theme-toggle-icons" aria-hidden="true">
+                <svg class="site-theme-toggle-icon site-theme-toggle-icon--moon" viewBox="0 0 24 24" fill="none" role="presentation">
+                    <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <svg class="site-theme-toggle-icon site-theme-toggle-icon--sun" viewBox="0 0 24 24" fill="none" role="presentation">
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"></circle>
+                    <path d="M12 2.75v2.1M12 19.15v2.1M21.25 12h-2.1M4.85 12h-2.1M18.54 5.46l-1.48 1.48M6.94 17.06l-1.48 1.48M18.54 18.54l-1.48-1.48M6.94 6.94L5.46 5.46" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                </svg>
+            </span>
+            <span class="site-theme-toggle-label" data-theme-toggle-label>Night mode</span>
+        </button>
+    </li>
+</ul>
+{% endwith %}

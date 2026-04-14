@@ -11,10 +11,31 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
-    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260407r">
+    <script>
+    (function () {
+        const storageKey = "norsu-site-theme";
+        let resolvedTheme = "day";
+
+        try {
+            const savedTheme = window.localStorage.getItem(storageKey);
+            if (savedTheme === "night" || savedTheme === "day") {
+                resolvedTheme = savedTheme;
+            } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        } catch (error) {
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        }
+
+        document.documentElement.setAttribute("data-site-theme", resolvedTheme);
+    }());
+    </script>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260414-home-refresh">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100 site-body">
+<body class="d-flex flex-column min-vh-100 site-body{% block body_class %}{% endblock %}"{% block body_attrs %}{% endblock %}>
     {% include "includes/site_nav.html" %}
 
     <main class="flex-grow-1">
@@ -28,6 +49,111 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"
     ></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navbar = document.getElementById("siteNavbar");
+
+        if (!navbar) {
+            return;
+        }
+
+        function handleNavbarScroll() {
+            if (window.scrollY > 24) {
+                navbar.classList.add("navbar-scrolled");
+            } else {
+                navbar.classList.remove("navbar-scrolled");
+            }
+        }
+
+        handleNavbarScroll();
+        window.addEventListener("scroll", handleNavbarScroll, { passive: true });
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const revealItems = document.querySelectorAll("[data-reveal]");
+
+        if (!revealItems.length) {
+            return;
+        }
+
+        document.body.classList.add("motion-ready");
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reducedMotion || !("IntersectionObserver" in window)) {
+            revealItems.forEach((item) => item.classList.add("is-visible"));
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) {
+                        return;
+                    }
+
+                    entry.target.classList.add("is-visible");
+                    observer.unobserve(entry.target);
+                });
+            },
+            {
+                threshold: 0.14,
+                rootMargin: "0px 0px -8% 0px",
+            }
+        );
+
+        revealItems.forEach((item) => observer.observe(item));
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeToggles = Array.from(document.querySelectorAll("[data-site-theme-toggle]"));
+        const root = document.documentElement;
+        const storageKey = "norsu-site-theme";
+
+        function getTheme() {
+            return root.getAttribute("data-site-theme") === "night" ? "night" : "day";
+        }
+
+        function applyTheme(theme) {
+            const nextTheme = theme === "night" ? "night" : "day";
+            const switchLabel = nextTheme === "night" ? "day mode" : "night mode";
+
+            root.setAttribute("data-site-theme", nextTheme);
+
+            themeToggles.forEach((themeToggle) => {
+                const themeLabel = themeToggle.querySelector("[data-theme-toggle-label]");
+
+                themeToggle.setAttribute("aria-pressed", String(nextTheme === "night"));
+                themeToggle.setAttribute("aria-label", "Switch to " + switchLabel);
+                themeToggle.setAttribute("title", "Switch to " + switchLabel);
+
+                if (themeLabel) {
+                    themeLabel.textContent = nextTheme === "night" ? "Day mode" : "Night mode";
+                }
+            });
+        }
+
+        applyTheme(getTheme());
+
+        if (!themeToggles.length) {
+            return;
+        }
+
+        themeToggles.forEach((themeToggle) => {
+            themeToggle.addEventListener("click", function () {
+                const nextTheme = getTheme() === "night" ? "day" : "night";
+                applyTheme(nextTheme);
+
+                try {
+                    window.localStorage.setItem(storageKey, nextTheme);
+                } catch (error) {
+                    return;
+                }
+            });
+        });
+    });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

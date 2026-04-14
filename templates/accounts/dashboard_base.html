@@ -11,7 +11,28 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
-    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260407r">
+    <script>
+    (function () {
+        const storageKey = "norsu-site-theme";
+        let resolvedTheme = "day";
+
+        try {
+            const savedTheme = window.localStorage.getItem(storageKey);
+            if (savedTheme === "night" || savedTheme === "day") {
+                resolvedTheme = savedTheme;
+            } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        } catch (error) {
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                resolvedTheme = "night";
+            }
+        }
+
+        document.documentElement.setAttribute("data-site-theme", resolvedTheme);
+    }());
+    </script>
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260413m">
     {% if form %}{{ form.media.css }}{% endif %}
     {% block extra_css %}{% endblock %}
 </head>
@@ -26,7 +47,7 @@
     {% else %}
         {% url 'accounts:department_admin_dashboard' as dashboard_home_url %}
     {% endif %}
-    <nav class="navbar navbar-expand-lg site-navbar dashboard-navbar shadow-sm" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg site-navbar dashboard-navbar shadow-sm" data-bs-theme="dark" id="dashboardNavbar">
         <div class="container">
             <a class="navbar-brand site-brand" href="{{ dashboard_home_url }}">
                 <img
@@ -56,19 +77,39 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center dashboard-top-nav">
                     <li class="nav-item"><a class="nav-link" href="{{ dashboard_home_url }}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}">Public Site</a></li>
+                    <li class="nav-item site-theme-toggle-item ms-lg-2 mt-3 mt-lg-0">
+                        <button
+                            class="btn site-theme-toggle"
+                            type="button"
+                            id="siteThemeToggle"
+                            aria-label="Switch to night mode"
+                            aria-pressed="false"
+                            title="Switch to night mode"
+                        >
+                            <span class="site-theme-toggle-icons" aria-hidden="true">
+                                <svg class="site-theme-toggle-icon site-theme-toggle-icon--moon" viewBox="0 0 24 24" fill="none" role="presentation">
+                                    <path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                                <svg class="site-theme-toggle-icon site-theme-toggle-icon--sun" viewBox="0 0 24 24" fill="none" role="presentation">
+                                    <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"></circle>
+                                    <path d="M12 2.75v2.1M12 19.15v2.1M21.25 12h-2.1M4.85 12h-2.1M18.54 5.46l-1.48 1.48M6.94 17.06l-1.48 1.48M18.54 18.54l-1.48-1.48M6.94 6.94L5.46 5.46" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                                </svg>
+                            </span>
+                            <span class="site-theme-toggle-label" data-theme-toggle-label>Night mode</span>
+                        </button>
+                    </li>
                     {% if request.user.role == "super_admin" %}
-                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:school_info_update' %}" class="nav-link">Edit Homepage</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:school_info_update' %}" class="nav-link">Edit Homepage and Calendar</a></li>
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:department_list' %}" class="nav-link">Manage Departments</a></li>
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:department_admin_list' %}" class="nav-link">Manage Department Admins</a></li>
-                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:update_list' %}" class="nav-link">Manage Updates</a></li>
-                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:event_list' %}" class="nav-link">Manage Events</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:update_list' %}" class="nav-link">Manage University Updates</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:event_list' %}" class="nav-link">Manage University Events</a></li>
+                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:super_admin_account_settings' %}" class="nav-link">Account Settings</a></li>
                     {% else %}
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:program_list' %}" class="nav-link dashboard-section-link">Programs</a></li>
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:instructor_list' %}" class="nav-link dashboard-section-link">Instructors</a></li>
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:update_list' %}" class="nav-link dashboard-section-link">Updates</a></li>
                         <li class="nav-item d-lg-none"><a href="{% url 'accounts:event_list' %}" class="nav-link dashboard-section-link">Events</a></li>
-                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:alumni_list' %}" class="nav-link dashboard-section-link">Alumni</a></li>
-                        <li class="nav-item d-lg-none"><a href="{% url 'accounts:alumni_list' %}" class="nav-link">Manage Alumni</a></li>
                     {% endif %}
                     <li class="nav-item d-lg-none"><hr class="site-mobile-nav-divider"></li>
                     <li class="nav-item d-lg-none">
@@ -91,18 +132,21 @@
                         <ul class="dropdown-menu dropdown-menu-end site-menu-dropdown">
                             {% if request.user.role == "super_admin" %}
                                 <li><span class="dropdown-header site-menu-section">Manage</span></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:school_info_update' %}">Edit Homepage</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:school_info_update' %}">Edit Homepage and Calendar</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:department_list' %}">Manage Departments</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:department_admin_list' %}">Manage Department Admins</a></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:update_list' %}">Manage Updates</a></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:event_list' %}">Manage Events</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:update_list' %}">Manage University Updates</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:event_list' %}">Manage University Events</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:alumni_dashboard' %}">Alumni Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:super_admin_account_settings' %}">Account Settings</a></li>
                             {% else %}
                                 <li><span class="dropdown-header site-menu-section">Manage</span></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:program_list' %}">Programs</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:instructor_list' %}">Instructors</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:update_list' %}">Updates</a></li>
                                 <li><a class="dropdown-item" href="{% url 'accounts:event_list' %}">Events</a></li>
-                                <li><a class="dropdown-item" href="{% url 'accounts:alumni_list' %}">Alumni</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:alumni_dashboard' %}">Alumni Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:alumni_list' %}">Manage Alumni</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider site-menu-divider"></li>
                             <li><a class="dropdown-item site-menu-danger" href="{% url 'accounts:logout' %}">Logout</a></li>
@@ -134,6 +178,54 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"
     ></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeToggle = document.getElementById("siteThemeToggle");
+        const themeLabel = themeToggle ? themeToggle.querySelector("[data-theme-toggle-label]") : null;
+        const root = document.documentElement;
+        const storageKey = "norsu-site-theme";
+
+        function getTheme() {
+            return root.getAttribute("data-site-theme") === "night" ? "night" : "day";
+        }
+
+        function applyTheme(theme) {
+            const nextTheme = theme === "night" ? "night" : "day";
+            const switchLabel = nextTheme === "night" ? "day mode" : "night mode";
+
+            root.setAttribute("data-site-theme", nextTheme);
+
+            if (!themeToggle) {
+                return;
+            }
+
+            themeToggle.setAttribute("aria-pressed", String(nextTheme === "night"));
+            themeToggle.setAttribute("aria-label", "Switch to " + switchLabel);
+            themeToggle.setAttribute("title", "Switch to " + switchLabel);
+
+            if (themeLabel) {
+                themeLabel.textContent = nextTheme === "night" ? "Day mode" : "Night mode";
+            }
+        }
+
+        applyTheme(getTheme());
+
+        if (!themeToggle) {
+            return;
+        }
+
+        themeToggle.addEventListener("click", function () {
+            const nextTheme = getTheme() === "night" ? "day" : "night";
+            applyTheme(nextTheme);
+
+            try {
+                window.localStorage.setItem(storageKey, nextTheme);
+            } catch (error) {
+                return;
+            }
+        });
+    });
+    </script>
     {% if form %}{{ form.media.js }}{% endif %}
     {% block extra_js %}{% endblock %}
 </body>

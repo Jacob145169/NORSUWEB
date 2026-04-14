@@ -23,20 +23,37 @@
 
 <section class="section-block pt-0">
     <div class="container">
-        <article class="info-card">
-            {% if event.image %}
-                <img src="{{ event.image.url }}" class="update-detail-image mb-4" alt="{{ event.title }}">
-            {% endif %}
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                <div class="content-meta mb-0">{{ event.source_label }}</div>
-                <span class="badge rounded-pill text-bg-light border">Event</span>
-                <span class="badge rounded-pill text-bg-light border">{{ event.schedule_label }}</span>
-                {% if event.location %}
-                    <span class="badge rounded-pill text-bg-light border">{{ event.location }}</span>
+        <article class="mission-vision-card update-detail-card">
+            <div class="update-detail-card-body">
+                {% if event.video or event.image %}
+                    <div class="update-detail-hero mb-4">
+                        {% if event.video %}
+                            <video
+                                class="update-detail-video"
+                                controls
+                                playsinline
+                                preload="metadata"
+                                {% if event.image %}poster="{{ event.image.url }}"{% endif %}
+                            >
+                                <source src="{{ event.video.url }}">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% else %}
+                            <img src="{{ event.image.url }}" class="update-detail-image" alt="{{ event.title }}">
+                        {% endif %}
+                    </div>
                 {% endif %}
-            </div>
-            <div class="richtext-content">
-                {{ event.description|safe_richtext }}
+                <div class="update-detail-meta-row">
+                    <span class="update-detail-chip">{{ event.source_label }}</span>
+                    <span class="update-detail-chip">Event</span>
+                    <span class="update-detail-chip">{{ event.schedule_label }}</span>
+                    {% if event.location %}
+                        <span class="update-detail-chip">{{ event.location }}</span>
+                    {% endif %}
+                </div>
+                <div class="richtext-content update-detail-content mt-4">
+                    {{ event.description|safe_richtext }}
+                </div>
             </div>
         </article>
     </div>

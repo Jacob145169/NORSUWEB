@@ -4,36 +4,42 @@ DEPARTMENTS = [
         "name": "College of Arts and Sciences",
         "description": "Academic programs for arts, sciences, and computing-related disciplines.",
         "theme_color": "#0f6b4f",
+        "theme_color_secondary": "#2563eb",
     },
     {
         "code": "CTED",
         "name": "College of Teacher Education",
         "description": "Teacher education programs for elementary and secondary instruction.",
         "theme_color": "#1f6f8b",
+        "theme_color_secondary": "#f59e0b",
     },
     {
         "code": "CCJE",
         "name": "College of Criminal Justice Education",
         "description": "Programs focused on criminology and public safety education.",
         "theme_color": "#6b1f2a",
+        "theme_color_secondary": "#d97706",
     },
     {
         "code": "CBA",
         "name": "College of Business Administration",
         "description": "Business, management, and hospitality-related academic programs.",
         "theme_color": "#9a6b12",
+        "theme_color_secondary": "#facc15",
     },
     {
         "code": "CIT",
         "name": "College of Industrial Technology",
         "description": "Technology and industry-oriented programs across applied disciplines.",
         "theme_color": "#4b5563",
+        "theme_color_secondary": "#0ea5e9",
     },
     {
         "code": "CAF",
         "name": "College of Agriculture and Forestry",
         "description": "Agriculture, forestry, and animal science programs.",
         "theme_color": "#3f7d20",
+        "theme_color_secondary": "#84cc16",
     },
 ]
 
@@ -120,4 +126,3 @@ PROGRAMS_BY_DEPARTMENT = {
         },
     ],
 }
-

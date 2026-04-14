@@ -10,12 +10,20 @@ class Department(models.Model):
     mission = models.TextField(blank=True, default="")
     vision = models.TextField(blank=True, default="")
     banner_image = models.ImageField(upload_to="departments/banners/", blank=True, null=True)
+    course_uniform_description = models.TextField(blank=True, default="")
+    course_uniform_image = models.ImageField(upload_to="departments/uniforms/", blank=True, null=True)
     dean_name = models.CharField(max_length=255, blank=True)
     assistant_dean_name = models.CharField(max_length=255, blank=True)
     dean_photo = models.ImageField(upload_to="departments/leadership/", blank=True, null=True)
     assistant_dean_photo = models.ImageField(upload_to="departments/leadership/", blank=True, null=True)
     logo = models.ImageField(upload_to="departments/logos/", blank=True, null=True)
     theme_color = models.CharField(max_length=7, default="#0f6b4f", help_text="Hex color code, e.g. #0f6b4f.")
+    theme_color_secondary = models.CharField(
+        max_length=7,
+        blank=True,
+        default="",
+        help_text="Optional second hex color used for department gradients.",
+    )
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -30,12 +38,17 @@ class Department(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    @property
+    def theme_gradient_end(self) -> str:
+        return self.theme_color_secondary or self.theme_color
+
     def __str__(self) -> str:
         return self.name
 
 
 class SchoolInfo(models.Model):
     college_name = models.CharField(max_length=255)
+    landing_background_image = models.ImageField(upload_to="school_info/landing/", blank=True, null=True)
     mission = models.TextField()
     vision = models.TextField()
     strategic_goals = models.TextField(blank=True, default="")
@@ -62,6 +75,7 @@ class SchoolInfo(models.Model):
             pk=1,
             defaults={
                 "college_name": "Negros Oriental State University",
+                "landing_background_image": None,
                 "mission": "",
                 "vision": "",
                 "strategic_goals": "",
@@ -122,3 +136,22 @@ class SchoolInfo(models.Model):
 
     def __str__(self) -> str:
         return self.college_name
+
+
+class CalendarImage(models.Model):
+    school_info = models.ForeignKey(
+        SchoolInfo,
+        on_delete=models.CASCADE,
+        related_name="calendar_images",
+    )
+    image = models.ImageField(upload_to="school_info/calendar/")
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["sort_order", "created_at", "pk"]
+        verbose_name = "Calendar Image"
+        verbose_name_plural = "Calendar Images"
+
+    def __str__(self) -> str:
+        return f"{self.school_info.college_name} Calendar Image {self.pk}"

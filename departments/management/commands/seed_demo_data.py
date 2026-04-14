@@ -44,6 +44,7 @@ class Command(BaseCommand):
                     "name": department_data["name"],
                     "description": department_data["description"],
                     "theme_color": department_data["theme_color"],
+                    "theme_color_secondary": department_data.get("theme_color_secondary", ""),
                     "is_active": True,
                 },
             )

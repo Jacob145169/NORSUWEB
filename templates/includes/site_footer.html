@@ -1,45 +1,55 @@
 {% load static %}
 <footer class="site-footer mt-auto">
-    <div class="container py-4">
-        <div class="row g-3 align-items-start">
-            <div class="col-lg-5">
-                <div class="footer-brand">
-                    <img
-                        src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
-                        alt="NORSU logo"
-                        class="site-brand-logo footer-brand-logo"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
-                    >
-                    <div class="site-brand-mark site-brand-mark-fallback footer-brand-mark">NORSU</div>
-                    <div>
-                        <h2 class="h5 mb-2 text-white">Negros Oriental State University</h2>
-                        <p class="mb-0 footer-copy">
-                            Official university information website for institutional content, departmental updates, and academic public information.
+    <div class="container py-3 py-lg-4">
+        <div class="site-footer-shell">
+            <div class="row g-3 align-items-start position-relative">
+                <div class="col-lg-5">
+                    <div class="footer-brand footer-brand-panel">
+                        <div class="footer-brand-media">
+                            <img
+                                src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
+                                alt="NORSU logo"
+                                class="site-brand-logo footer-brand-logo"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"
+                            >
+                            <div class="site-brand-mark site-brand-mark-fallback footer-brand-mark">NORSU</div>
+                        </div>
+                        <div>
+                            <h3 class="footer-brand-name mb-1">NORSU</h3>
+                            <p class="footer-campus mb-0">Bayawan Sta. Catalina Campus</p>
+                            <p class="footer-copy mt-3 mb-0">
+                                Empowering future-ready learners through quality education, research, and community engagement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="footer-link-card">
+                        <h4 class="footer-heading">Quick Links</h4>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'core:home' %}">Home</a></li>
+                            <li><a href="{% url 'core:about' %}#history">History</a></li>
+                            <li><a href="{% url 'core:updates' %}">Updates</a></li>
+                            <li><a href="{% url 'departments:list' %}">Departments</a></li>
+                            <li><a href="{% url 'core:alumni' %}">Alumni</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <div class="footer-link-card">
+                        <h4 class="footer-heading">Connect</h4>
+                        <p class="footer-copy mt-0 mb-2">
+                            View the contact page for the official campus address, email, and phone details.
                         </p>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'core:contact' %}">Contact NORSU</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-3">
-                <h3 class="footer-heading">Explore</h3>
-                <ul class="footer-links">
-                    <li><a href="{% url 'core:home' %}#mission">Mission</a></li>
-                    <li><a href="{% url 'core:home' %}#vision">Vision</a></li>
-                    <li><a href="{% url 'core:history' %}">History</a></li>
-                    <li><a href="{% url 'departments:list' %}">Departments</a></li>
-                </ul>
-            </div>
-            <div class="col-sm-6 col-lg-4">
-                <h3 class="footer-heading">Access</h3>
-                <ul class="footer-links">
-                    <li><a href="{% url 'accounts:login' %}">Admin Portal</a></li>
-                    <li><a href="{% url 'core:updates' %}#updates">Updates</a></li>
-                    <li><a href="{% url 'core:updates' %}#events">Events</a></li>
-                </ul>
+            <div class="footer-bottom text-center pt-2 mt-3">
+                <p class="mb-0">&copy; {% now "Y" %} Negros Oriental State University. All rights reserved.</p>
             </div>
         </div>
-        <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2 pt-3 mt-3">
-            <p class="mb-0">&copy; {% now "Y" %} Negros Oriental State University</p>
-            <p class="mb-0">NORSU BSC Website</p>
-            </div>
     </div>
 </footer>

@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     AdminLoginView,
     AlumniCreateView,
+    AlumniDashboardView,
     AlumniDeleteView,
     AlumniExportPdfView,
     AlumniListView,
@@ -19,6 +20,7 @@ from .views import (
     EventListView,
     EventUpdateView,
     InstructorCreateView,
+    InstructorDetailView,
     InstructorDeleteView,
     InstructorListView,
     NewsCreateView,
@@ -39,6 +41,7 @@ from .views import (
     NewsUpdateView,
     ProgramUpdateView,
     SchoolInfoUpdateView,
+    SuperAdminAccountUpdateView,
     SuperAdminDashboardView,
     UpdateCreateView,
     UpdatesListView,
@@ -58,6 +61,7 @@ urlpatterns = [
 
     # Super admin management
     path("dashboard/super-admin/school-info/", SchoolInfoUpdateView.as_view(), name="school_info_update"),
+    path("dashboard/super-admin/account/", SuperAdminAccountUpdateView.as_view(), name="super_admin_account_settings"),
     path("dashboard/super-admin/departments/", DepartmentListView.as_view(), name="department_list"),
     path("dashboard/super-admin/departments/add/", DepartmentCreateView.as_view(), name="department_create"),
     path("dashboard/super-admin/departments/<int:pk>/edit/", DepartmentUpdateView.as_view(), name="department_update"),
@@ -86,6 +90,7 @@ urlpatterns = [
     path("events/add/", EventCreateView.as_view(), name="event_create"),
     path("events/<int:pk>/edit/", EventUpdateView.as_view(), name="event_update"),
     path("events/<int:pk>/delete/", EventDeleteView.as_view(), name="event_delete"),
+    path("alumni/dashboard/", AlumniDashboardView.as_view(), name="alumni_dashboard"),
     path("alumni/", AlumniListView.as_view(), name="alumni_list"),
     path("alumni/export/pdf/", AlumniExportPdfView.as_view(), name="alumni_export_pdf"),
     path("alumni/add/", AlumniCreateView.as_view(), name="alumni_create"),
@@ -93,6 +98,7 @@ urlpatterns = [
     path("alumni/<int:pk>/delete/", AlumniDeleteView.as_view(), name="alumni_delete"),
     path("instructors/", InstructorListView.as_view(), name="instructor_list"),
     path("instructors/add/", InstructorCreateView.as_view(), name="instructor_create"),
+    path("instructors/<int:pk>/", InstructorDetailView.as_view(), name="instructor_detail"),
     path("instructors/<int:pk>/edit/", InstructorUpdateView.as_view(), name="instructor_update"),
     path("instructors/<int:pk>/delete/", InstructorDeleteView.as_view(), name="instructor_delete"),
 ]

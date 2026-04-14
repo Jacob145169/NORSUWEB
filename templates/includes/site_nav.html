@@ -1,6 +1,6 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg site-navbar shadow-sm" data-bs-theme="dark">
-    <div class="container">
+<nav class="navbar navbar-expand-lg site-navbar site-navbar--glass" data-bs-theme="dark" id="siteNavbar">
+    <div class="container site-navbar-shell">
         <a class="navbar-brand site-brand" href="{% url 'core:home' %}">
             <img
                 src="{% static 'images/branding/site-logo.png' %}?v=20260402-logo"
@@ -26,17 +26,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
-            {% with current_view=request.resolver_match.view_name current_app=request.resolver_match.app_name %}
-            <ul class="navbar-nav ms-auto align-items-lg-center">
-                <li class="nav-item"><a class="nav-link{% if current_view == 'core:home' %} is-active{% endif %}" href="{% url 'core:home' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link{% if current_view == 'core:history' %} is-active{% endif %}" href="{% url 'core:history' %}">History</a></li>
-                <li class="nav-item"><a class="nav-link{% if current_view == 'core:updates' or current_view == 'core:update_detail' %} is-active{% endif %}" href="{% url 'core:updates' %}">Updates</a></li>
-                <li class="nav-item"><a class="nav-link{% if current_app == 'departments' %} is-active{% endif %}" href="{% url 'departments:list' %}">Departments</a></li>
-                <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                    <a class="btn btn-sm btn-light site-nav-cta" href="{% url 'accounts:login' %}">Admin Portal</a>
-                </li>
-            </ul>
-            {% endwith %}
+            {% include "includes/site_nav_items.html" with nav_prefix="siteNav" %}
         </div>
     </div>
 </nav>
